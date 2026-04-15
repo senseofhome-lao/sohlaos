@@ -471,14 +471,29 @@ function goTab(id,el){
 }
 
 // API
-const SCRIPT_URL='https://script.google.com/macros/s/AKfycbzI9hdEz4R8LCTtDSSrpNoLpWz6aKjbcsWOUz4ovZ_BmE2fJcwPOQ14AiNSaFnkSW4x/exec';
+const SCRIPT_URL='https://script.google.com/macros/s/AKfycbzrkmjUhHCviwpx3097srwqKr8HL6Y4ARolf8CeLCVbZ3H99B2zKEMHxgd7tKOHpxJ5/exec';
 
 async function api(payload){
-  const res=await fetch(SCRIPT_URL,{
-    method:'POST',
-    body:JSON.stringify(payload),
-    redirect:'follow'
-  });
+  const action = payload.action;
+  const data   = payload.data || {};
+  // ສ້າງ URL params ແຍກກັນ
+  const params = new URLSearchParams();
+  params.set('action', action);
+  // ສົ່ງ data fields ທີ່ສຳຄັນ
+  if (data.pass)    params.set('pass', data.pass);
+  if (data.sku)     params.set('sku', data.sku);
+  if (data.delta !== undefined) params.set('delta', data.delta);
+  if (data.invNo)   params.set('invNo', data.invNo);
+  if (data.lotId)   params.set('lotId', data.lotId);
+  // ສົ່ງ data ທີ່ເຫຼືອ JSON
+  const extra = Object.keys(data).filter(k=>!['pass','sku','delta','invNo','lotId'].includes(k));
+  if (extra.length > 0) {
+    const obj = {};
+    extra.forEach(k => obj[k] = data[k]);
+    params.set('d', JSON.stringify(obj));
+  }
+  const url = SCRIPT_URL + '?' + params.toString();
+  const res = await fetch(url, {method:'GET', redirect:'follow'});
   return res.json();
 }
 
