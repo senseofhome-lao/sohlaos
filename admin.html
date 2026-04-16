@@ -275,11 +275,24 @@ body{background:var(--cream);font-family:'Noto Sans Thai',sans-serif;color:var(-
       </div>
     </div>
     <div class="fg">
-      <label class="fl">URL ຮູບພາບ</label>
+      <label class="fl">ຮູບພາບ 1 (ຫຼັກ) *</label>
       <div class="fhint">Google Drive: ແຊຣໄຟລ໌ → Copy link</div>
-      <input class="fi" id="pImg" placeholder="https://drive.google.com/..." oninput="prvImg()" style="margin-top:5px">
-      <img id="imgPrv" style="display:none;width:80px;height:80px;object-fit:cover;border:1px solid var(--sand);margin-top:6px">
+      <input class="fi" id="pImg1" placeholder="https://drive.google.com/..." oninput="prvImgs()" style="margin-top:5px">
     </div>
+    <div class="fg">
+      <label class="fl">ຮູບພາບ 2</label>
+      <input class="fi" id="pImg2" placeholder="https://drive.google.com/..." oninput="prvImgs()">
+    </div>
+    <div class="fg">
+      <label class="fl">ຮູບພາບ 3</label>
+      <input class="fi" id="pImg3" placeholder="https://drive.google.com/..." oninput="prvImgs()">
+    </div>
+    <div class="fg">
+      <label class="fl">ຮູບພາບ 4</label>
+      <input class="fi" id="pImg4" placeholder="https://drive.google.com/..." oninput="prvImgs()">
+    </div>
+    <!-- preview strip -->
+    <div id="imgPrvStrip" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px"></div>
     <div class="divider"></div>
     <div class="sec-title">✦ ຕົ້ນທຶນຕໍ່ຊີ້ນ</div>
     <div class="g2">
@@ -652,13 +665,22 @@ function prvSKU(){
   const cnt=products.filter(p=>(p.cat||p['ໝວດໝູ່'])===cat).length+1;
   document.getElementById('skuPrv').textContent=pfx+'-'+String(cnt).padStart(3,'0');
 }
-function prvImg(){
-  const url=document.getElementById('pImg').value.trim();
-  const img=document.getElementById('imgPrv');
-  if(!url){img.style.display='none';return;}
-  img.src=toDrive(url);img.style.display='block';
-  img.onerror=()=>img.style.display='none';
+function prvImgs(){
+  const strip=document.getElementById('imgPrvStrip');
+  strip.innerHTML='';
+  [1,2,3,4].forEach(i=>{
+    const url=(document.getElementById('pImg'+i)||{}).value||'';
+    if(!url.trim())return;
+    const img=document.createElement('img');
+    img.src=toDrive(url.trim());
+    img.style.cssText='width:70px;height:70px;object-fit:cover;border:1px solid var(--sand)';
+    img.onerror=()=>img.remove();
+    strip.appendChild(img);
+  });
 }
+// keep old name for compatibility
+function prvImg(){prvImgs();}
+
 function calcCPv(){
   const sell=+document.getElementById('pPrice').value||0;
   const ci=+document.getElementById('pCI').value||0;
@@ -676,12 +698,16 @@ async function addProduct(){
   const nameTh=document.getElementById('pTh').value.trim();
   const price=+document.getElementById('pPrice').value;
   if(!nameTh||!price){toast('⚠️ ກະລຸນາປ້ອນຊື່ ແລະ ລາຄາ');return;}
+  const imgs=[1,2,3,4].map(i=>{
+    const v=(document.getElementById('pImg'+i)||{}).value||'';
+    return v.trim()?toDrive(v.trim()):'';
+  });
   const res=await callAPI({action:'addProduct',data:{
     nameTh,nameEn:document.getElementById('pEn').value.trim(),
     cat:document.getElementById('pCat').value,price,stock:+document.getElementById('pStock').value||0,
     salePrice:+document.getElementById('pSalePrice').value||0,
     preorder:document.getElementById('pPreorder').value,
-    imgUrl:toDrive(document.getElementById('pImg').value.trim()),
+    imgUrl:imgs[0],imgUrl2:imgs[1],imgUrl3:imgs[2],imgUrl4:imgs[3],
     costItem:+document.getElementById('pCI').value||0,
     costShip:+document.getElementById('pCS').value||0,
     costOther:+document.getElementById('pCO').value||0
@@ -690,10 +716,10 @@ async function addProduct(){
   else toast('❌ '+res.message);
 }
 function clrProduct(){
-  ['pTh','pEn','pPrice','pSalePrice','pStock','pImg','pCI','pCS','pCO'].forEach(i=>{const el=document.getElementById(i);if(el)el.value='';});
+  ['pTh','pEn','pPrice','pSalePrice','pStock','pImg1','pImg2','pImg3','pImg4','pCI','pCS','pCO'].forEach(i=>{const el=document.getElementById(i);if(el)el.value='';});
   document.getElementById('pCat').value='ເຟີນີເຈີ';
   document.getElementById('pPreorder').value='false';
-  document.getElementById('imgPrv').style.display='none';
+  document.getElementById('imgPrvStrip').innerHTML='';
   calcCPv();prvSKU();
 }
 async function delProduct(sku){
