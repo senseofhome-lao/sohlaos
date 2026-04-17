@@ -307,11 +307,11 @@ function renderCatalog(){
       <div style="font-size:13px">ກະລຸນາກັບມາໃໝ່ໃນໄວໆນີ້ເດີ້</div></div>`;
     return;
   }
-  const filtered=catFilter==='all'?products:products.filter(p=>(p.cat||p['หมวดหมู่'])===catFilter);
+  const filtered=catFilter==='all'?products:products.filter(p=>(p.cat||p['ໝວດ']||p['ໝວດໝູ່'])===catFilter);
   const cats=catFilter==='all'?CATS:[catFilter];
   let html='';
   cats.forEach(cat=>{
-    const items=filtered.filter(p=>(p.cat||p['หมวดหมู่'])===cat);
+    const items=filtered.filter(p=>(p.cat||p['ໝວດ']||p['ໝວດໝູ່'])===cat);
     if(!items.length) return;
     html+=`<div class="section-block">
       <div class="section-head">
@@ -324,10 +324,10 @@ function renderCatalog(){
       <div class="prod-grid">
       ${items.map(p=>{
         const sku=p.sku||p['SKU']||'';
-        const nameTh=p.nameTh||p['ชื่อสินค้า (ไทย)']||'';
+        const nameTh=p.nameTh||p['ຊື່ສິນຄ້າ']||p['ຊື່ສິນຄ້າ (ລາວ)']||'';
         const nameEn=p.nameEn||p['ชื่อสินค้า (EN)']||'';
-        const price=+p.price||+p['ราคาขาย']||0;
-        const imgUrl=toDriveUrl(p.imgUrl||p['URL รูปภาพ']||'');
+        const price=+p.price||+p['ລາຄາຂາຍ']||0;
+        const imgUrl=toDriveUrl(p.imgUrl||p['URL ຮູບ']||'');
         const st=stockMap[sku]||{qty:0};
         const qty=Number(st.qty||0);
         const stInfo=qty===0?['st-out','ໝົດແລ້ວ']:qty<=3?['st-low','ໃກ້ໝົດ']:['st-ok','ມີສິນຄ້າ'];
@@ -370,11 +370,11 @@ function renderCatalog(){
 
 function openModal(sku){
   const p=products.find(x=>(x.sku||x['SKU'])===sku);if(!p) return;
-  const nameTh=p.nameTh||p['ชื่อสินค้า (ไทย)']||'';
+  const nameTh=p.nameTh||p['ຊື່ສິນຄ້າ']||p['ຊື່ສິນຄ້າ (ລາວ)']||'';
   const nameEn=p.nameEn||p['ชื่อสินค้า (EN)']||'';
-  const price=+p.price||+p['ราคาขาย']||0;
-  const cat=p.cat||p['หมวดหมู่']||'';
-  const imgUrl=toDriveUrl(p.imgUrl||p['URL รูปภาพ']||'');
+  const price=+p.price||+p['ລາຄາຂາຍ']||0;
+  const cat=p.cat||p['ໝວດ']||p['ໝວດໝູ່']||'';
+  const imgUrl=toDriveUrl(p.imgUrl||p['URL ຮູບ']||'');
   const st=stockMap[sku]||{qty:0};
   const qty=Number(st.qty||0);
   const stInfo=qty===0?['st-out','ສິນຄ້າໝົດແລ້ວ']:qty<=3?['st-low','ເຫຼືອໜ້ອຍ']:['st-ok','ມີສິນຄ້າ'];
