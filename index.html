@@ -113,6 +113,16 @@ body{background:var(--cream);font-family:'Noto Sans Thai',sans-serif;color:var(-
 .modal-handle{width:40px;height:4px;background:var(--sand);border-radius:2px;margin:12px auto 0;}
 .modal-img{width:100%;aspect-ratio:16/10;object-fit:cover;display:block;background:var(--light-sage);}
 .modal-img-ph{width:100%;aspect-ratio:16/10;background:var(--light-sage);display:flex;align-items:center;justify-content:center;font-size:64px;opacity:.2;}
+/* GALLERY */
+.gallery-wrap{position:relative;overflow:hidden;background:var(--light-sage);}
+.gallery-track{display:flex;transition:transform .35s ease;}
+.gallery-slide{min-width:100%;aspect-ratio:16/10;object-fit:cover;display:block;}
+.gallery-dots{display:flex;justify-content:center;gap:6px;padding:8px 0;}
+.g-dot{width:6px;height:6px;border-radius:50%;background:var(--sand2);cursor:pointer;transition:background .2s;}
+.g-dot.active{background:var(--espresso);}
+.gallery-btn{position:absolute;top:50%;transform:translateY(-50%);background:rgba(61,43,26,.5);color:white;border:none;width:32px;height:32px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;z-index:10;}
+.gallery-btn.prev{left:8px;}
+.gallery-btn.next{right:8px;}
 .modal-body{padding:20px 20px 32px;}
 .modal-sku{font-size:9px;letter-spacing:3px;color:var(--gold2);text-transform:uppercase;margin-bottom:6px;}
 .modal-name{font-family:'Playfair Display',serif;font-size:26px;color:var(--espresso);line-height:1.1;margin-bottom:4px;}
@@ -243,7 +253,7 @@ let products=[], stockMap={}, catFilter='all';
 function fmt(n){return Number(n||0).toLocaleString('th',{maximumFractionDigits:0});}
 function toDriveUrl(url){const m=(url||'').match(/\/d\/([a-zA-Z0-9_-]+)/);return m?`https://drive.google.com/thumbnail?id=${m[1]}&sz=w600`:url;}
 
-const SCRIPT_URL='https://script.google.com/macros/s/AKfycbzI9hdEz4R8LCTtDSSrpNoLpWz6aKjbcsWOUz4ovZ_BmE2fJcwPOQ14AiNSaFnkSW4x/exec';
+const SCRIPT_URL='https://script.google.com/macros/s/AKfycbzrkmjUhHCviwpx3097srwqKr8HL6Y4ARolf8CeLCVbZ3H99B2zKEMHxgd7tKOHpxJ5/exec';
 
 function init(){
   loadData();
@@ -273,12 +283,10 @@ async function loadData(){
 }
 
 async function api(payload){
-  // Apps Script ຕ້ອງໃຊ້ redirect:follow ແລະ ບໍ່ສາມາດ set Content-Type
-  const res=await fetch(SCRIPT_URL,{
-    method:'POST',
-    body:JSON.stringify(payload),
-    redirect:'follow'
-  });
+  const params = new URLSearchParams();
+  params.set('action', payload.action);
+  const url = SCRIPT_URL + '?' + params.toString();
+  const res = await fetch(url, {method:'GET', redirect:'follow'});
   return res.json();
 }
 
@@ -400,9 +408,31 @@ function openModal(sku){
   } else {
     document.querySelector('.preorder-btn')?.remove();
   }
-  document.getElementById('modalImgWrap').innerHTML=imgUrl
-    ?`<img class="modal-img" src="${imgUrl}" alt="${nameTh}" onerror="this.parentElement.innerHTML='<div class=\\'modal-img-ph\\'>${EMOJI[cat]||'📦'}</div>'">`
-    :`<div class="modal-img-ph">${EMOJI[cat]||'📦'}</div>`;
+  const imgs=[
+    toDriveUrl(p.imgUrl||p['URL ຮູບ']||''),
+    toDriveUrl(p.imgUrl2||p['URL ຮູບ 2']||''),
+    toDriveUrl(p.imgUrl3||p['URL ຮູບ 3']||''),
+    toDriveUrl(p.imgUrl4||p['URL ຮູບ 4']||'')
+  ].filter(u=>u);
+
+  const imgWrap=document.getElementById('modalImgWrap');
+  if(imgs.length===0){
+    imgWrap.innerHTML=`<div class="modal-img-ph">${EMOJI[cat]||'📦'}</div>`;
+  } else if(imgs.length===1){
+    imgWrap.innerHTML=`<img class="modal-img" src="${imgs[0]}" alt="${nameTh}" onerror="this.parentElement.innerHTML='<div class=\\'modal-img-ph\\'>${EMOJI[cat]||'📦'}</div>'">`;
+  } else {
+    let cur=0;
+    const slides=imgs.map((u,i)=>`<img class="gallery-slide" src="${u}" data-i="${i}" onerror="this.style.display='none'">`).join('');
+    const dots=imgs.map((_,i)=>`<div class="g-dot ${i===0?'active':''}" onclick="gotoSlide(${i})"></div>`).join('');
+    imgWrap.innerHTML=`
+      <div class="gallery-wrap" id="galleryWrap">
+        <button class="gallery-btn prev" onclick="gSlide(-1)">‹</button>
+        <div class="gallery-track" id="galleryTrack">${slides}</div>
+        <button class="gallery-btn next" onclick="gSlide(1)">›</button>
+      </div>
+      <div class="gallery-dots">${dots}</div>`;
+    window._gCur=0;window._gLen=imgs.length;
+  }
   document.getElementById('prodModal').classList.add('show');
   document.body.style.overflow='hidden';
 }
@@ -423,6 +453,18 @@ function showToast(msg){
 let startY=0;
 document.querySelector('.modal-sheet')?.addEventListener('touchstart',e=>startY=e.touches[0].clientY);
 document.querySelector('.modal-sheet')?.addEventListener('touchend',e=>{if(e.changedTouches[0].clientY-startY>80)closeModal();});
+
+// gallery functions
+function gSlide(dir){
+  window._gCur=(window._gCur+dir+window._gLen)%window._gLen;
+  gotoSlide(window._gCur);
+}
+function gotoSlide(i){
+  window._gCur=i;
+  const t=document.getElementById('galleryTrack');
+  if(t)t.style.transform=`translateX(-${i*100}%)`;
+  document.querySelectorAll('.g-dot').forEach((d,j)=>d.classList.toggle('active',j===i));
+}
 
 init();
 </script>
