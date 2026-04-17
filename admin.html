@@ -240,7 +240,18 @@ body{background:var(--cream);font-family:'Noto Sans Thai',sans-serif;color:var(-
   <!-- TAB: OVERVIEW -->
   <div class="a-sec active" id="tabOverview">
     <div class="stats-grid" id="statsGrid"></div>
-    <div class="sec-title">✦ ສະຕ໋ອກ ແລະ ຕົ້ນທຶນສິນຄ້າ</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
+      <div class="sec-title" style="margin-bottom:0;border:none;padding:0">✦ ສະຕ໋ອກ ແລະ ຕົ້ນທຶນສິນຄ້າ</div>
+      <select class="fs" id="catFilter" onchange="renderProdList()" style="width:auto;padding:7px 12px;font-size:11px">
+        <option value="all">ທຸກໝວດ</option>
+        <option value="ເຟີນີເຈີ">🛋️ ເຟີນີເຈີ</option>
+        <option value="ຂອງຕົກແຕ່ງ">🪴 ຂອງຕົກແຕ່ງ</option>
+        <option value="ແສງສະຫວ່າງ">💡 ແສງສະຫວ່າງ</option>
+        <option value="ຫ້ອງນອນ">🛏️ ຫ້ອງນອນ</option>
+        <option value="ຫ້ອງຄົວ">🍳 ຫ້ອງຄົວ</option>
+        <option value="ຫ້ອງນ້ຳ">🚿 ຫ້ອງນ້ຳ</option>
+      </select>
+    </div>
     <div class="prod-list" id="prodList"></div>
   </div>
 
@@ -615,13 +626,15 @@ function renderStats(){
 function renderProdList(){
   const el=document.getElementById('prodList');
   if(!products.length){el.innerHTML='<div style="padding:30px;text-align:center;color:var(--brown);font-size:13px">ຍັງບໍ່ມີສິນຄ້າ</div>';return;}
-  el.innerHTML=products.map(p=>{
+  const filterCat=(document.getElementById('catFilter')||{}).value||'all';
+  const list=filterCat==='all'?products:products.filter(p=>(p.cat||p['ໝວດໝູ່'])===filterCat);
+  if(!list.length){el.innerHTML='<div style="padding:20px;text-align:center;color:var(--brown);font-size:13px">ບໍ່ມີສິນຄ້າໃນໝວດນີ້</div>';return;}
+  el.innerHTML=list.map(p=>{
     const sku=p.sku||p['SKU']||'';
-    const nameTh=p.nameTh||p['ຊື່ສິນຄ້າ (ລາວ)']||'';
-    const nameEn=p.nameEn||p['ຊື່ສິນຄ້າ (EN)']||'';
+    const nameTh=p.nameTh||p['ຊື່ສິນຄ້າ']||p['ຊື່ສິນຄ້າ (ລາວ)']||'';
     const cat=p.cat||p['ໝວດໝູ່']||'';
     const price=+p.price||+p['ລາຄາຂາຍ']||0;
-    const imgUrl=toDrive(p.imgUrl||p['URL ຮູບພາບ']||'');
+    const imgUrl=toDrive(p.imgUrl||p['URL ຮູບ']||p['URL ຮູບພາບ']||'');
     const isPreorder=(p.preorder||p['preorder'])==='true'||p.preorder===true;
     const salePrice=+p.salePrice||+p['ລາຄາຫຼຸດ']||0;
     const st=stockMap[sku]||{qty:0,minQty:3};
@@ -630,20 +643,22 @@ function renderProdList(){
     const cost=(+c.costItem||0)+(+c.costShip||0)+(+c.costOther||0);
     const profit=price-cost;
     const stB=isPreorder
-      ?'<span class="s-badge" style="background:#3D2B1A;color:#D4A85A;border:1px solid #D4A85A">PREORDER</span>'
+      ?'<span class="s-badge" style="background:#3D2B1A;color:#D4A85A;border:1px solid #D4A85A">PRE</span>'
       :qty===0?'<span class="s-badge s-out">ໝົດ</span>'
       :qty<=(Number(st.minQty)||3)?'<span class="s-badge s-low">ໃກ້ໝົດ</span>'
-      :'<span class="s-badge s-ok">ມີສິນຄ້າ</span>';
+      :'<span class="s-badge s-ok">ມີ</span>';
     const priceHtml=salePrice>0
-      ?`<div style="font-size:10px;text-decoration:line-through;color:var(--sand2)">₭${fmt(price)}</div><div style="color:var(--danger);font-weight:700">₭${fmt(salePrice)}</div>`
+      ?`<span style="font-size:9px;text-decoration:line-through;color:var(--sand2)">₭${fmt(price)}</span> <span style="color:var(--danger);font-weight:700">₭${fmt(salePrice)}</span>`
       :`₭${fmt(price)}`;
-    const imgEl=imgUrl?`<img src="${imgUrl}" class="prod-row-img" onerror="this.style.display='none'">`:`<div class="prod-row-img-ph">${EMOJI[cat]||'📦'}</div>`;
+    const imgEl=imgUrl
+      ?`<img src="${imgUrl}" class="prod-row-img" onerror="this.outerHTML='<div class=\\'prod-row-img-ph\\'>${EMOJI[cat]||'📦'}</div>'">`
+      :`<div class="prod-row-img-ph">${EMOJI[cat]||'📦'}</div>`;
     return`<div class="prod-row">
       ${imgEl}
       <div class="prod-row-info">
-        <div class="prod-row-sku">${sku}</div>
+        <div class="prod-row-sku">${sku} · <span style="color:var(--gold2)">${cat}</span></div>
         <div class="prod-row-name">${nameTh}</div>
-        <div class="prod-row-sub">${priceHtml} ${cost>0?`· ຕົ້ນທຶນ ₭${fmt(cost)} · <span class="${profit>=0?'profit-p':'profit-n'}">ກຳໄລ ₭${fmt(profit)}</span>`:''}</div>
+        <div class="prod-row-sub">${priceHtml}${cost>0?` · <span class="${profit>=0?'profit-p':'profit-n'}">ກຳໄລ ₭${fmt(profit)}</span>`:''}</div>
       </div>
       <div class="prod-row-right">
         ${stB}
@@ -652,7 +667,10 @@ function renderProdList(){
           <div class="s-num">${qty}</div>
           <button class="s-btn" onclick="chStock('${sku}',1)">+</button>
         </div>
-        <button class="btn-sm-del" onclick="delProduct('${sku}')">🗑</button>
+        <div style="display:flex;gap:4px">
+          <button class="s-btn" style="width:auto;padding:0 8px;font-size:12px;color:var(--brown)" onclick="editProduct('${sku}')" title="ແກ້ໄຂ">✏️</button>
+          <button class="btn-sm-del" onclick="delProduct('${sku}')">🗑</button>
+        </div>
       </div>
     </div>`;
   }).join('');
@@ -720,7 +738,61 @@ function clrProduct(){
   document.getElementById('pCat').value='ເຟີນີເຈີ';
   document.getElementById('pPreorder').value='false';
   document.getElementById('imgPrvStrip').innerHTML='';
+  // reset edit mode
+  const btn=document.querySelector('#tabAdd .btn-p');
+  if(btn){btn.textContent='+ ເພີ່ມສິນຄ້າ';btn.onclick=addProduct;}
+  document.getElementById('tabAdd').dataset.editSku='';
   calcCPv();prvSKU();
+}
+
+function editProduct(sku){
+  const p=products.find(x=>(x.sku||x['SKU'])===sku);if(!p)return;
+  // switch to add tab
+  goTab('tabAdd',document.querySelectorAll('.at')[1]);
+  // fill form
+  document.getElementById('pTh').value=p.nameTh||p['ຊື່ສິນຄ້າ']||'';
+  document.getElementById('pEn').value=p.nameEn||p['ຊື່ EN']||'';
+  document.getElementById('pCat').value=p.cat||p['ໝວດໝູ່']||'ເຟີນີເຈີ';
+  document.getElementById('pPrice').value=p.price||p['ລາຄາຂາຍ']||0;
+  document.getElementById('pSalePrice').value=p.salePrice||p['ລາຄາຫຼຸດ']||0;
+  document.getElementById('pStock').value=(stockMap[sku]||{qty:0}).qty||0;
+  document.getElementById('pPreorder').value=String(p.preorder||'false');
+  const imgs=[p.imgUrl||p['URL ຮູບ']||'',p.imgUrl2||p['URL ຮູບ 2']||'',p.imgUrl3||p['URL ຮູບ 3']||'',p.imgUrl4||p['URL ຮູບ 4']||''];
+  [1,2,3,4].forEach((n,i)=>{const el=document.getElementById('pImg'+n);if(el)el.value=imgs[i]||'';});
+  const c=costMap[sku]||{};
+  document.getElementById('pCI').value=c.costItem||0;
+  document.getElementById('pCS').value=c.costShip||0;
+  document.getElementById('pCO').value=c.costOther||0;
+  prvImgs();calcCPv();
+  // change button to update
+  document.getElementById('tabAdd').dataset.editSku=sku;
+  const btn=document.querySelector('#tabAdd .btn-p');
+  if(btn){btn.textContent='💾 ບັນທຶກການແກ້ໄຂ';btn.onclick=updateProduct;}
+  toast(`✏️ ແກ້ໄຂ ${sku}`);
+}
+
+async function updateProduct(){
+  const sku=document.getElementById('tabAdd').dataset.editSku;
+  if(!sku){addProduct();return;}
+  const nameTh=document.getElementById('pTh').value.trim();
+  const price=+document.getElementById('pPrice').value;
+  if(!nameTh||!price){toast('⚠️ ກະລຸນາປ້ອນຊື່ ແລະ ລາຄາ');return;}
+  const imgs=[1,2,3,4].map(i=>{
+    const v=(document.getElementById('pImg'+i)||{}).value||'';
+    return v.trim()?toDrive(v.trim()):'';
+  });
+  const res=await callAPI({action:'updateProduct',data:{
+    sku,nameTh,nameEn:document.getElementById('pEn').value.trim(),
+    cat:document.getElementById('pCat').value,price,
+    salePrice:+document.getElementById('pSalePrice').value||0,
+    preorder:document.getElementById('pPreorder').value,
+    imgUrl:imgs[0],imgUrl2:imgs[1],imgUrl3:imgs[2],imgUrl4:imgs[3],
+    costItem:+document.getElementById('pCI').value||0,
+    costShip:+document.getElementById('pCS').value||0,
+    costOther:+document.getElementById('pCO').value||0
+  }});
+  if(res.status==='ok'){toast(`✓ ແກ້ໄຂ "${nameTh}" ສຳເລັດ`);clrProduct();await loadData();}
+  else toast('❌ '+(res.message||'ເກີດຂໍ້ຜິດພາດ'));
 }
 async function delProduct(sku){
   if(!confirm(`ລົບສິນຄ້າ ${sku}?`))return;
