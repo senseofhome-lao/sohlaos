@@ -598,7 +598,7 @@ async function loadData(){
   ]);
   products=rP.data||[];lots=rL.data||[];sales=rS.data||[];
   const sd=rSt.data||{};
-  if(Array.isArray(sd)){stockMap={};sd.forEach(r=>{stockMap[r['SKU']||r.sku]={qty:Number(r['ສະຕ໋ອກປັດຈຸບັນ']||r.qty||0),minQty:Number(r['ສະຕ໋ອກຂັ້ນຕ່ຳ']||r.minQty||3)};});}
+  if(Array.isArray(sd)){stockMap={};sd.forEach(r=>{stockMap[r['SKU']||r.sku]={qty:Number(r['ສະຕ໋ອກ']||r['ສະຕ໋ອກປັດຈຸບັນ']||r.qty||0),minQty:Number(r['ຂັ້ນຕ່ຳ']||r['ສະຕ໋ອກຂັ້ນຕ່ຳ']||r.minQty||3)};});}
   else stockMap=sd;
   const cd=rC.data||{};
   if(Array.isArray(cd)){costMap={};cd.forEach(r=>{costMap[r['SKU']||r.sku]={costItem:Number(r['ລາຄາຊື້/ຊີ້ນ']||r.costItem||0),costShip:Number(r['ຄ່າສົ່ງ/ຊີ້ນ']||r.costShip||0),costOther:Number(r['ຄ່າອື່ນ/ຊີ້ນ']||r.costOther||0)};});}
