@@ -253,41 +253,63 @@ let products=[], stockMap={}, catFilter='all';
 function fmt(n){return Number(n||0).toLocaleString('th',{maximumFractionDigits:0});}
 function toDriveUrl(url){const m=(url||'').match(/\/d\/([a-zA-Z0-9_-]+)/);return m?`https://drive.google.com/thumbnail?id=${m[1]}&sz=w600`:url;}
 
-const SCRIPT_URL='https://script.google.com/macros/s/AKfycbzrkmjUhHCviwpx3097srwqKr8HL6Y4ARolf8CeLCVbZ3H99B2zKEMHxgd7tKOHpxJ5/exec';
+const SCRIPT_URL='https://script.google.com/macros/s/AKfycbzszqSdpQOG3AjZal-FGnTmZydoWDmZ49F6Zkai3QuUJg0LzPXZbvjfaS2wx0l--ocN/exec';
 
 function init(){
   loadData();
 }
 
-async function loadData(){
-  try{
-    const [rP,rS]=await Promise.all([
-      api({action:'getProducts'}),
-      api({action:'getStock'})
-    ]);
+function loadData(){
+  loadJsonp('getProducts', function(rP){
     products=(rP&&rP.data)||[];
-    const sd=(rS&&rS.data)||{};
-    stockMap={};
-    if(Array.isArray(sd)){
-      sd.forEach(function(row){
-        var sku=row['SKU']||row.sku||'';
-        var qty=Number(row['ສະຕ໋ອກ']||row.qty||0);
-        stockMap[sku]={qty:qty};
-      });
-    } else { stockMap=sd; }
-    renderCatalog();
-  }catch(e){
-    console.log('loadData error:',e);
-    renderCatalog();
-  }
+    loadJsonp('getStock', function(rS){
+      const sd=(rS&&rS.data)||{};
+      stockMap={};
+      if(Array.isArray(sd)){
+        sd.forEach(function(row){
+          var sku=row['SKU']||row.sku||'';
+          var qty=Number(row['ສະຕ໋ອກ']||row['Stock']||row.qty||0);
+          stockMap[sku]={qty:qty};
+        });
+      } else { stockMap=sd; }
+      renderCatalog();
+    });
+  });
 }
 
-async function api(payload){
-  const params = new URLSearchParams();
-  params.set('action', payload.action);
-  const url = SCRIPT_URL + '?' + params.toString();
-  const res = await fetch(url, {method:'GET', redirect:'follow'});
-  return res.json();
+function loadJsonp(action, cb){
+  const cbName='_cb_'+Math.random().toString(36).slice(2);
+  window[cbName]=function(data){
+    try{cb(data);}catch(e){console.log(e);}
+    delete window[cbName];
+    const s=document.getElementById(cbName);
+    if(s)s.remove();
+  };
+  const s=document.createElement('script');
+  s.id=cbName;
+  s.src=SCRIPT_URL+'?action='+encodeURIComponent(action)+'&callback='+cbName;
+  s.onerror=function(){
+    console.log('JSONP error:',action);
+    try{cb({});}catch(e){}
+    delete window[cbName];
+    s.remove();
+  };
+  document.head.appendChild(s);
+  setTimeout(function(){
+    if(window[cbName]){
+      console.log('JSONP timeout:',action);
+      try{cb({});}catch(e){}
+      delete window[cbName];
+      const el=document.getElementById(cbName);
+      if(el)el.remove();
+    }
+  }, 15000);
+}
+
+function api(payload){
+  return new Promise(function(resolve){
+    loadJsonp(payload.action+'&d='+encodeURIComponent(JSON.stringify(payload.data||{})), resolve);
+  });
 }
 
 function filterCat(cat,el){
