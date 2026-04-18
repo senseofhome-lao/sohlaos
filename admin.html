@@ -969,7 +969,7 @@ async function addSale(doPrint=false){
   const res=await callAPI({action:'addSale',data});
   if(res.status==='ok'){
     toast(`✓ ບັນທຶກ ${res.invNo}`);
-    if(doPrint)showInv({...data,...res});
+    if(doPrint)showInv({...res,...data});
     clrSale();await loadData();
   } else toast('❌ '+(res.message||'ເກີດຂໍ້ຜິດພາດ'));
 }
