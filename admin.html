@@ -450,7 +450,7 @@ function LS(k){try{return JSON.parse(localStorage.getItem(k));}catch{return null
 function SS(k,v){localStorage.setItem(k,JSON.stringify(v));}
 function today(){return new Date().toISOString().slice(0,10);}
 function fmt(n){return Number(n||0).toLocaleString('th',{maximumFractionDigits:0});}
-function toDrive(url){const m=(url||'').match(/\/d\/([a-zA-Z0-9_-]+)/);return m?`https://drive.google.com/thumbnail?id=${m[1]}&sz=w400`:url;}
+function toDrive(url){const m=(url||'').match(/\/d\/([a-zA-Z0-9_-]+)/);return m?`https://drive.google.com/thumbnail?id=${m[1]}&sz=w300`:url;}
 
 // INIT
 function init(){
@@ -505,7 +505,7 @@ function goTab(id,el){
 }
 
 // API
-const SCRIPT_URL='https://script.google.com/macros/s/AKfycbzszqSdpQOG3AjZal-FGnTmZydoWDmZ49F6Zkai3QuUJg0LzPXZbvjfaS2wx0l--ocN/exec';
+const SCRIPT_URL='https://script.google.com/macros/s/AKfycby2_Pp21RZrDy1_YTtfe_wdv1qArTOT1-DYHJNdxf6zPB9G6jnmXg0LpKil22592Iic/exec';
 
 async function api(payload){
   const action = payload.action;
