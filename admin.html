@@ -645,7 +645,8 @@ function renderProdList(){
     const qty=Number(st.qty||0);
     const c=costMap[sku]||{};
     const cost=(+c.costItem||0)+(+c.costShip||0)+(+c.costOther||0);
-    const profit=price-cost;
+    const sellPrice=salePrice>0?salePrice:price;
+    const profit=sellPrice-cost;
     const stB=isPreorder
       ?'<span class="s-badge" style="background:#3D2B1A;color:#D4A85A;border:1px solid #D4A85A">PRE</span>'
       :qty===0?'<span class="s-badge s-out">ໝົດ</span>'
