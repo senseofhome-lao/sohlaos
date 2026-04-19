@@ -251,6 +251,7 @@ body{background:var(--cream);font-family:'Noto Sans Thai',sans-serif;color:var(-
         <option value="ຫ້ອງນອນ">🛏️ ຫ້ອງນອນ</option>
         <option value="ຫ້ອງຄົວ">🍳 ຫ້ອງຄົວ</option>
         <option value="ຫ້ອງນ້ຳ">🚿 ຫ້ອງນ້ຳ</option>
+        <option value="ເຄື່ອງໃຊ້ໃນບ້ານ">🏠 ເຄື່ອງໃຊ້ໃນບ້ານ</option>
       </select>
     </div>
     <div class="prod-list" id="prodList"></div>
@@ -266,7 +267,7 @@ body{background:var(--cream);font-family:'Noto Sans Thai',sans-serif;color:var(-
         <select class="fs" id="pCat" onchange="prvSKU()">
           <option>ເຟີນີເຈີ</option><option>ຂອງຕົກແຕ່ງ</option>
           <option>ແສງສະຫວ່າງ</option><option>ຫ້ອງນອນ</option>
-          <option>ຫ້ອງຄົວ</option><option>ຫ້ອງນ້ຳ</option>
+          <option>ຫ້ອງຄົວ</option><option>ຫ້ອງນ້ຳ</option><option>ເຄື່ອງໃຊ້ໃນບ້ານ</option>
         </select>
       </div>
       <div class="fg"><label class="fl">ລະຫັດສິນຄ້າ (ອັດຕະໂນມັດ)</label>
@@ -437,9 +438,9 @@ body{background:var(--cream);font-family:'Noto Sans Thai',sans-serif;color:var(-
 <div class="toast" id="toast"></div>
 
 <script>
-const CATS=['ເຟີນີເຈີ','ຂອງຕົກແຕ່ງ','ແສງສະຫວ່າງ','ຫ້ອງນອນ','ຫ້ອງຄົວ','ຫ້ອງນ້ຳ'];
-const EMOJI={'ເຟີນີເຈີ':'🛋️','ຂອງຕົກແຕ່ງ':'🪴','ແສງສະຫວ່າງ':'💡','ຫ້ອງນອນ':'🛏️','ຫ້ອງຄົວ':'🍳','ຫ້ອງນ້ຳ':'🚿'};
-const SKU_PFX={'ເຟີນີເຈີ':'FN','ຂອງຕົກແຕ່ງ':'DC','ແສງສະຫວ່າງ':'LT','ຫ້ອງນອນ':'BD','ຫ້ອງຄົວ':'KT','ຫ້ອງນ້ຳ':'BT'};
+const CATS=['ເຟີນີເຈີ','ຂອງຕົກແຕ່ງ','ແສງສະຫວ່າງ','ຫ້ອງນອນ','ຫ້ອງຄົວ','ຫ້ອງນ້ຳ','ເຄື່ອງໃຊ້ໃນບ້ານ'];
+const EMOJI={'ເຟີນີເຈີ':'🛋️','ຂອງຕົກແຕ່ງ':'🪴','ແສງສະຫວ່າງ':'💡','ຫ້ອງນອນ':'🛏️','ຫ້ອງຄົວ':'🍳','ຫ້ອງນ້ຳ':'🚿','ເຄື່ອງໃຊ້ໃນບ້ານ':'🏠'};
+const SKU_PFX={'ເຟີນີເຈີ':'FN','ຂອງຕົກແຕ່ງ':'DC','ແສງສະຫວ່າງ':'LT','ຫ້ອງນອນ':'BD','ຫ້ອງຄົວ':'KT','ຫ້ອງນ້ຳ':'BT','ເຄື່ອງໃຊ້ໃນບ້ານ':'HH'};
 const CH_LBL={direct:'ໜ້າຮ້ານ',online:'ອອນໄລນ໌',other:'ອື່ນໆ'};
 const CH_CLS={direct:'ch-d',online:'ch-o',other:'ch-x'};
 
