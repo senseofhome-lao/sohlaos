@@ -527,7 +527,7 @@ function goTab(id,el){
 }
 
 // API
-const SCRIPT_URL='https://script.google.com/macros/s/AKfycby2_Pp21RZrDy1_YTtfe_wdv1qArTOT1-DYHJNdxf6zPB9G6jnmXg0LpKil22592Iic/exec';
+const SCRIPT_URL='https://script.google.com/macros/s/AKfycbxgAvXxwuj2r86l8QBhrf_Z9NmHjVZ1qu5rFJ-oA4GDFPAKr7UXcDja0B3C3jSKSpxz/exec';
 
 async function api(payload){
   const action = payload.action;
@@ -1077,32 +1077,24 @@ async function submitSale(doPrint=false){
   const channel=document.getElementById('sCh').value;
   const date=document.getElementById('sDate').value||today();
 
-  let lastRes=null;
-  let allInvNos=[];
-  let grandNet=0;
+  // ສ້າງ INV ດຽວ ສຳລັບທຸກລາຍການ
+  const res=await callAPI({action:'addSaleMulti',data:{
+    items:cart,
+    channel,date,customerName,customerPhone,customerAddress,cashier,note
+  }});
 
-  for(const item of cart){
-    const res=await callAPI({action:'addSale',data:{
-      sku:item.sku,productName:item.productName,
-      qty:item.qty,unitPrice:item.price,discount:item.disc,unitCost:item.unitCost,
-      channel,date,customerName,customerPhone,customerAddress,note
-    }});
-    if(res.status==='ok'){
-      allInvNos.push(res.invNo);
-      grandNet+=(res.net||0);
-      lastRes=res;
+  if(res.status==='ok'){
+    const grandNet=cart.reduce((s,x)=>s+(x.price*x.qty)-x.disc,0);
+    toast(`✓ ບັນທຶກ ${res.invNo} (${cart.length} ລາຍການ)`);
+    if(doPrint){
+      showInvMulti(cart,{customerName,customerPhone,customerAddress,cashier,channel,date,note,invNos:[res.invNo],grandNet});
     }
+    cart=[];
+    clrSale();
+    await loadData();
+  } else {
+    toast('❌ '+(res.message||'ເກີດຂໍ້ຜິດພາດ'));
   }
-
-  toast(`✓ ບັນທຶກ ${allInvNos.length} ລາຍການ: ${allInvNos.join(', ')}`);
-
-  if(doPrint && lastRes){
-    // ສ້າງໃບບິນລວມ
-    showInvMulti(cart,{customerName,customerPhone,customerAddress,cashier,channel,date,note,invNos:allInvNos,grandNet});
-  }
-  cart=[];
-  clrSale();
-  await loadData();
 }
 
 function showInvMulti(items,info){
@@ -1116,13 +1108,14 @@ function showInvMulti(items,info){
       <td>₭${fmt(net)}</td>
     </tr>`;
   }).join('');
+  const invNo=info.invNos[0]||'—';
   document.getElementById('invoicePrint').innerHTML=`
     <div class="inv-hdr">
       <div><div class="inv-brand">Sense of Home</div><div class="inv-brand-sub">ອະລັງການງານແຕ່ງບ້ານ</div></div>
-      <div class="inv-meta">ເລກທີ່: <strong>${info.invNos.join(', ')}</strong><br>ວັນທີ່: ${info.date}<br>${CH_LBL[info.channel]||info.channel}</div>
+      <div class="inv-meta">ເລກທີ່: <strong>${invNo}</strong><br>ວັນທີ່: ${info.date}<br>${CH_LBL[info.channel]||info.channel}</div>
     </div>
     <div class="inv-parties">
-      <div><div class="inv-party-lbl">ຜູ້ຂາຍ / ຜູ້ຮັບເງິນ</div><div class="inv-party-val">
+      <div><div class="inv-party-lbl">ຜູ້ຂາຍ</div><div class="inv-party-val">
         <strong>Sense of Home</strong><br>
         ${info.cashier?'👤 ຜູ້ຮັບເງິນ: <strong>'+info.cashier+'</strong>':''}
       </div></div>
@@ -1140,6 +1133,23 @@ function showInvMulti(items,info){
       <div class="inv-tr grand"><span>ຍອດສຸດທິ</span><span>₭${fmt(info.grandNet)}</span></div>
     </div>
     ${info.note?`<div style="margin-top:14px;font-size:11px;color:#777">ໝາຍເຫດ: ${info.note}</div>`:''}
+
+    <!-- ຫ້ອງເຊັນ -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:40px;padding-top:20px;border-top:1px solid #eee;">
+      <div style="text-align:center">
+        <div style="font-size:10px;color:#BFA070;letter-spacing:2px;text-transform:uppercase;margin-bottom:50px">ຜູ້ຮັບເງິນ</div>
+        <div style="border-top:1px solid #3D2B1A;padding-top:8px;font-size:12px;color:#3D2B1A">
+          ${info.cashier||'...................................'}
+        </div>
+      </div>
+      <div style="text-align:center">
+        <div style="font-size:10px;color:#BFA070;letter-spacing:2px;text-transform:uppercase;margin-bottom:50px">ຜູ້ຈ່າຍເງິນ</div>
+        <div style="border-top:1px solid #3D2B1A;padding-top:8px;font-size:12px;color:#3D2B1A">
+          ${info.customerName||'...................................'}
+        </div>
+      </div>
+    </div>
+
     <div class="inv-footer">ຂອບໃຈທີ່ສະໜັບສະໜູນ Sense of Home 🏠</div>`;
   document.getElementById('invoiceModal').classList.add('show');
 }
@@ -1165,33 +1175,58 @@ function renderSales(){
   const profit=sales.reduce((s,x)=>s+Number(x.profit||x['ກຳໄລ']||0),0);
   const qty=sales.reduce((s,x)=>s+Number(x.qty||x['ຈຳນວນ']||0),0);
   const ss=document.getElementById('salesSum');
+
+  // ກຸ່ມໂດຍ INV
+  const grouped={};
+  sales.forEach(s=>{
+    const inv=s.invNo||s['InvNo']||'—';
+    if(!grouped[inv]) grouped[inv]=[];
+    grouped[inv].push(s);
+  });
+  const uniqueInvs=Object.keys(grouped).length;
+
   if(ss)ss.innerHTML=`
-    <div class="stat-card"><div class="stat-num">${sales.length}</div><div class="stat-label">ລາຍການ</div></div>
+    <div class="stat-card"><div class="stat-num">${uniqueInvs}</div><div class="stat-label">ໃບບິນ</div></div>
     <div class="stat-card"><div class="stat-num">${qty}</div><div class="stat-label">ຊີ້ນທີ່ຂາຍ</div></div>
     <div class="stat-card gold"><div class="stat-num">₭${fmt(rev)}</div><div class="stat-label">ລາຍຮັບລວມ</div></div>
     <div class="stat-card ok"><div class="stat-num">₭${fmt(profit)}</div><div class="stat-label">ກຳໄລລວມ</div></div>`;
+
   const el=document.getElementById('salesList');if(!el)return;
   const list=salesFilter==='all'?sales:sales.filter(s=>(s.channel||s['ຊ່ອງທາງ'])===salesFilter);
   if(!list.length){el.innerHTML='<div style="padding:24px;text-align:center;color:var(--brown);font-size:13px">ຍັງບໍ່ມີລາຍການຂາຍ</div>';return;}
-  el.innerHTML=[...list].reverse().map(s=>{
-    const invNo=s.invNo||s['InvNo']||'—';
-    const pName=s.productName||s['ສິນຄ້າ']||s['ຊື່ສິນຄ້າ']||'';
-    const cust=s.customerName||s['ຊື່ລູກຄ້າ']||'ລູກຄ້າທົ່ວໄປ';
-    const net=s.net||s['ຍອດສຸດທິ']||0;
-    const profit=s.profit||s['ກຳໄລ']||0;
-    const ch=s.channel||s['ຊ່ອງທາງ']||'other';
-    const date=s.date||s['ວັນທີ່']||'';
+
+  // ກຸ່ມຮາຍການທີ່ filter ແລ້ວ
+  const filteredGrouped={};
+  list.forEach(s=>{
+    const inv=s.invNo||s['InvNo']||'—';
+    if(!filteredGrouped[inv]) filteredGrouped[inv]=[];
+    filteredGrouped[inv].push(s);
+  });
+
+  const invKeys=Object.keys(filteredGrouped).reverse();
+  el.innerHTML=invKeys.map(invNo=>{
+    const items=filteredGrouped[invNo];
+    const first=items[0];
+    const cust=first.customerName||first['ຊື່ລູກຄ້າ']||'ລູກຄ້າທົ່ວໄປ';
+    const ch=first.channel||first['ຊ່ອງທາງ']||'other';
+    const date=first.date||first['ວັນທີ່']||'';
+    const totalNet=items.reduce((s,x)=>s+Number(x.net||x['ຍອດສຸດທິ']||0),0);
+    const totalProfit=items.reduce((s,x)=>s+Number(x.profit||x['ກຳໄລ']||0),0);
+    const prodList=items.map(x=>{
+      const name=x.productName||x['ສິນຄ້າ']||x['ຊື່ສິນຄ້າ']||'';
+      return`${name} × ${x.qty||x['ຈຳນວນ']||1}`;
+    }).join(', ');
     return`<div class="sale-card">
       <div class="sale-card-left">
         <div class="sale-inv">${invNo} · ${date}</div>
-        <div class="sale-prod">${pName} × ${s.qty||s['ຈຳນວນ']||1}</div>
+        <div class="sale-prod">${prodList}</div>
         <div class="sale-customer">👤 ${cust} <span class="${CH_CLS[ch]||'ch-x'}" style="margin-left:4px">${CH_LBL[ch]||ch}</span></div>
       </div>
       <div class="sale-card-right">
-        <div class="sale-amount">₭${fmt(net)}</div>
-        <div class="sale-profit-tag ${Number(profit)>=0?'profit-p':'profit-n'}">ກຳໄລ ₭${fmt(profit)}</div>
-        <button style="background:var(--gold2);border:none;padding:5px 10px;font-size:10px;cursor:pointer;margin-top:4px;font-family:'Noto Sans Thai',sans-serif" onclick="showInvById('${invNo}')">🖨️ ໃບບິນ</button>
-        <button class="btn-sm-del" onclick="delSale('${invNo}')">🗑</button>
+        <div class="sale-amount">₭${fmt(totalNet)}</div>
+        <div class="sale-profit-tag ${Number(totalProfit)>=0?'profit-p':'profit-n'}">ກຳໄລ ₭${fmt(totalProfit)}</div>
+        <button style="background:var(--gold2);border:none;padding:5px 10px;font-size:10px;cursor:pointer;margin-top:4px;font-family:'Noto Sans Thai',sans-serif" onclick="showInvByGroup('${invNo}')">🖨️ ໃບບິນ</button>
+        <button class="btn-sm-del" onclick="delSaleGroup('${invNo}')">🗑</button>
       </div>
     </div>`;
   }).join('');
@@ -1200,6 +1235,38 @@ async function delSale(invNo){
   if(!confirm('ລົບລາຍການຂາຍ?'))return;
   await callAPI({action:'deleteSale',data:{invNo}});
   toast('ລົບແລ້ວ');await loadData();
+}
+async function delSaleGroup(invNo){
+  if(!confirm(`ລົບໃບບິນ ${invNo} ທັງໝົດ?`))return;
+  const items=sales.filter(s=>(s.invNo||s['InvNo'])===invNo);
+  for(const s of items){
+    await callAPI({action:'deleteSale',data:{invNo:s.invNo||s['InvNo']}});
+  }
+  toast(`ລົບ ${invNo} ແລ້ວ`);await loadData();
+}
+function showInvByGroup(invNo){
+  const items=sales.filter(s=>(s.invNo||s['InvNo'])===invNo);
+  if(!items.length)return;
+  const first=items[0];
+  const grandNet=items.reduce((s,x)=>s+Number(x.net||x['ຍອດສຸດທິ']||0),0);
+  const cartItems=items.map(x=>({
+    sku:x.sku||x['SKU'],
+    productName:x.productName||x['ສິນຄ້າ']||'',
+    qty:x.qty||x['ຈຳນວນ']||1,
+    price:x.unitPrice||x['ລາຄາ/ຊີ້ນ']||0,
+    disc:x.discount||x['ສ່ວນຫຼຸດ']||0
+  }));
+  showInvMulti(cartItems,{
+    invNos:[invNo],
+    date:first.date||first['ວັນທີ່']||'',
+    customerName:first.customerName||first['ຊື່ລູກຄ້າ']||'',
+    customerPhone:first.customerPhone||first['ເບີໂທ']||'',
+    customerAddress:first.customerAddress||first['ທີ່ຢູ່']||'',
+    cashier:first.cashier||'',
+    channel:first.channel||first['ຊ່ອງທາງ']||'direct',
+    note:first.note||first['ໝາຍເຫດ']||'',
+    grandNet
+  });
 }
 
 // INVOICE
@@ -1236,6 +1303,23 @@ function showInv(d){
       <div class="inv-tr grand"><span>ຍອດສຸດທິ</span><span>₭${fmt(net)}</span></div>
     </div>
     ${d.note?`<div style="margin-top:14px;font-size:11px;color:#777">ໝາຍເຫດ: ${d.note}</div>`:''}
+
+    <!-- ຫ້ອງເຊັນ -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:40px;padding-top:20px;border-top:1px solid #eee;">
+      <div style="text-align:center">
+        <div style="font-size:10px;color:#BFA070;letter-spacing:2px;text-transform:uppercase;margin-bottom:50px">ຜູ້ຮັບເງິນ</div>
+        <div style="border-top:1px solid #3D2B1A;padding-top:8px;font-size:12px;color:#3D2B1A">
+          ${d.cashier||'...................................'}
+        </div>
+      </div>
+      <div style="text-align:center">
+        <div style="font-size:10px;color:#BFA070;letter-spacing:2px;text-transform:uppercase;margin-bottom:50px">ຜູ້ຈ່າຍເງິນ</div>
+        <div style="border-top:1px solid #3D2B1A;padding-top:8px;font-size:12px;color:#3D2B1A">
+          ${d.customerName||'...................................'}
+        </div>
+      </div>
+    </div>
+
     <div class="inv-footer">ຂອບໃຈທີ່ສະໜັບສະໜູນ Sense of Home 🏠</div>`;
   document.getElementById('invoiceModal').classList.add('show');
 }
