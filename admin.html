@@ -400,7 +400,7 @@ body{background:var(--cream);font-family:'Noto Sans Thai',sans-serif;color:var(-
       </div>
       <div style="flex:1">
         <div class="fl" style="margin-bottom:4px">ຈຳນວນ</div>
-        <input class="fi" id="sQ" type="number" value="1" min="1">
+        <input class="fi" id="sQ" type="number" value="1" min="1" oninput="updateAutoDisc()">
       </div>
       <div style="flex:1">
         <div class="fl" style="margin-bottom:4px">ລາຄາ/ຊີ້ນ</div>
@@ -553,12 +553,22 @@ const SCRIPT_URL='https://script.google.com/macros/s/AKfycbzBdHxdnIrDNkO3o5V71aF
 
 // LOGIN
 async function doLogin(){
-  const p=document.getElementById('loginPwd').value;
-  if(!p){document.getElementById('loginErr').textContent='ກະລຸນາໃສ່ລະຫັດຜ່ານ';return;}
-  document.getElementById('loginErr').textContent='ກຳລັງກວດສອບ...';
+  const p=document.getElementById('loginPwd').value.trim();
+  const err=document.getElementById('loginErr');
+  if(!p){err.textContent='ກະລຸນາໃສ່ລະຫັດຜ່ານ';return;}
+  err.textContent='ກຳລັງກວດສອບ...';
+  // ກວດກັບ server ໂດຍກົງ (ບໍ່ຜ່ານ offline) + ລອງໃໝ່ 2 ເທື່ອ ຖ້າເຊື່ອມຕໍ່ບໍ່ໄດ້
+  let r=null;
+  for(let i=0;i<3&&!r;i++){
+    try{
+      const ctl=new AbortController();const t=setTimeout(()=>ctl.abort(),20000);
+      const res=await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify({action:'checkPass',data:{pass:p}}),redirect:'follow',headers:{'Content-Type':'text/plain'},signal:ctl.signal});
+      clearTimeout(t);r=await res.json();
+    }catch(e){if(i<2){err.textContent='ກຳລັງເຊື່ອມຕໍ່ໃໝ່... ('+(i+2)+'/3)';await new Promise(z=>setTimeout(z,1500));}}
+  }
+  if(!r){err.textContent='⚠️ ເຊື່ອມຕໍ່ server ບໍ່ໄດ້ — ລະຫັດອາດຖືກແລ້ວ, ກວດອິນເຕີເນັດ ແລ້ວລອງໃໝ່';return;}
   try{
-    const r=await callAPI({action:'checkPass',data:{pass:p}});
-    if(r&&r.valid){
+    if(r.valid){
       PASS=p;
       document.getElementById('loginScreen').classList.add('hidden');
       loadData();
@@ -968,17 +978,35 @@ function populateSaleSelect(){
       const sku=p.sku||p['SKU']||'';
       const name=p.nameTh||p['ຊື່ສິນຄ້າ']||p['ຊື່']||p['ຊື່ສິນຄ້າ (ລາວ)']||'';
       const st=stockMap[sku]||{qty:0};
-      return`<option value="${sku}">${sku} — ${name} (${st.qty||0} ຊີ້ນ)</option>`;
+      const pr=getPrices(p);
+      const tag=pr.unitDisc>0?` 🏷️ ຫຼຸດ ₭${fmt(pr.sale)}`:'';
+      return`<option value="${sku}">${sku} — ${name} (${st.qty||0} ຊີ້ນ)${tag}</option>`;
     }).join('');
 }
 
 function onProdSelect(){
   const sku=document.getElementById('sProd').value;
   const p=products.find(x=>(x.sku||x['SKU'])===sku);
-  if(p){
-    const price=+p.price||+p['ລາຄາຂາຍ']||+p['ລາຄາ']||0;
-    document.getElementById('sP').value=price||'';
-  }
+  const sP=document.getElementById('sP');
+  if(!p){sP.value='';sP.dataset.unitDisc=0;document.getElementById('sD').value='0';return;}
+  const pr=getPrices(p);
+  sP.value=pr.price||'';
+  sP.dataset.unitDisc=pr.unitDisc;
+  updateAutoDisc();
+}
+
+// ລາຄາຂອງສິນຄ້າ: ລາຄາເດີມ, ລາຄາຫຼຸດ, ສ່ວນຫຼຸດຕໍ່ຊີ້ນ
+function getPrices(p){
+  const price=+p.price||+p['ລາຄາຂາຍ']||+p['ລາຄາ']||0;
+  const sale=+p.salePrice||+p['ລາຄາຫຼຸດ']||0;
+  const unitDisc=(sale>0&&sale<price)?(price-sale):0;
+  return{price,sale,unitDisc};
+}
+
+function updateAutoDisc(){
+  const ud=+document.getElementById('sP').dataset.unitDisc||0;
+  const qty=+document.getElementById('sQ').value||1;
+  document.getElementById('sD').value=ud*qty;
 }
 
 function addToCart(){
@@ -988,8 +1016,11 @@ function addToCart(){
   if(!p){return;}
   const qty=+document.getElementById('sQ').value||1;
   const cp=+document.getElementById('sP').value||0;
-  const price=cp||(+p.price||+p['ລາຄາຂາຍ']||0);
-  const disc=+document.getElementById('sD').value||0;
+  const pr=getPrices(p);
+  const price=cp||pr.price;
+  let disc=+document.getElementById('sD').value||0;
+  // ຖ້າຊ່ອງລາຄາວ່າງ (ໃຊ້ລາຄາເດີມ) ແລະ ບໍ່ໄດ້ໃສ່ສ່ວນຫຼຸດ → ໃຊ້ລາຄາຫຼຸດອັດຕະໂນມັດ
+  if(!cp&&!disc&&pr.unitDisc>0)disc=pr.unitDisc*qty;
   const st=stockMap[sku]||{qty:0};
 
   // ກວດສະຕ໋ອກ
@@ -1015,6 +1046,7 @@ function addToCart(){
   document.getElementById('sProd').value='';
   document.getElementById('sQ').value='1';
   document.getElementById('sP').value='';
+  document.getElementById('sP').dataset.unitDisc=0;
   document.getElementById('sD').value='0';
   renderCart();
 }
