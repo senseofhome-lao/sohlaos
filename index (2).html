@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Sense of Home — อลังการงานแต่งบ้าน ร้านเฟอร์นิเจอร์และของตกแต่งบ้านคุณภาพสูง">
+<title>Sense of Home — ອະລັງການງານແຕ່ງບ້ານ</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Noto+Sans+Thai:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#F7F2EA; --warm:#FDFAF5; --sand:#DDD0B8; --sand2:#C8B89A;
+  --brown:#8B6B4A; --espresso:#3D2B1A; --gold:#BFA070; --gold2:#D4A85A;
+  --sage:#8FA888; --light-sage:#EDF2EB;
+  --danger:#B83232; --warn:#D4812A; --ok:#4A8C5C; --ink:#2A2018;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--cream);font-family:'Noto Sans Thai',sans-serif;color:var(--ink);}
+
+/* TOPBAR */
+.topbar{background:var(--espresso);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;}
+.brand-wrap{display:flex;flex-direction:column;}
+.brand-name{font-family:'Playfair Display',serif;font-size:20px;color:var(--warm);letter-spacing:2px;line-height:1.2;}
+.brand-sub{font-size:8px;letter-spacing:3px;color:var(--gold);text-transform:uppercase;margin-top:1px;}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+.cart-btn{background:none;border:1px solid rgba(191,160,112,.4);color:var(--gold);padding:6px 14px;font-size:10px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;font-family:'Noto Sans Thai',sans-serif;transition:all .3s;}
+.cart-btn:hover{background:var(--gold2);color:var(--espresso);border-color:var(--gold2);}
+
+/* HERO */
+.hero{background:var(--espresso);padding:48px 24px 40px;text-align:center;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 60% 40%,rgba(212,168,90,.12) 0%,transparent 60%);}
+.hero-label{font-size:9px;letter-spacing:4px;color:var(--gold);text-transform:uppercase;margin-bottom:12px;position:relative;}
+.hero-title{font-family:'Playfair Display',serif;font-size:clamp(36px,8vw,72px);font-weight:400;color:var(--warm);line-height:1.05;position:relative;}
+.hero-title em{font-style:italic;color:var(--gold2);}
+.hero-sub{font-size:13px;color:var(--sand2);margin-top:14px;line-height:1.8;max-width:360px;margin-left:auto;margin-right:auto;position:relative;font-weight:300;}
+.hero-scroll{margin-top:28px;position:relative;}
+.hero-scroll-btn{display:inline-block;padding:11px 28px;border:1px solid var(--gold);color:var(--gold);font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;text-decoration:none;font-family:'Noto Sans Thai',sans-serif;transition:all .3s;}
+.hero-scroll-btn:hover{background:var(--gold2);color:var(--espresso);border-color:var(--gold2);}
+.hero-deco{display:flex;align-items:center;gap:14px;justify-content:center;margin-top:32px;opacity:.3;}
+.hero-deco-line{width:60px;height:1px;background:var(--gold);}
+.hero-deco-dot{font-size:12px;color:var(--gold);}
+
+/* CAT NAV */
+.cat-nav{background:var(--warm);border-bottom:1px solid var(--sand);display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;position:sticky;top:56px;z-index:100;}
+.cat-nav::-webkit-scrollbar{display:none;}
+.cat-tab{padding:14px 18px;font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;color:var(--brown);border-bottom:2px solid transparent;transition:all .3s;white-space:nowrap;font-weight:500;flex-shrink:0;}
+.cat-tab.active,.cat-tab:hover{border-bottom-color:var(--gold2);color:var(--espresso);}
+
+/* SECTION */
+.catalog-wrap{padding:28px 16px 60px;}
+.section-block{margin-bottom:48px;}
+.section-head{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:18px;padding-bottom:12px;border-bottom:1px solid var(--sand);}
+.sec-label{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--gold2);margin-bottom:4px;}
+.sec-name{font-family:'Playfair Display',serif;font-size:28px;font-weight:400;color:var(--espresso);}
+.sec-name em{font-style:italic;}
+.sec-count{font-size:10px;color:var(--brown);}
+
+/* PRODUCT GRID */
+.prod-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:2px;}
+.prod-card{background:var(--warm);cursor:pointer;overflow:hidden;position:relative;}
+.prod-card:active{opacity:.9;}
+.p-img{aspect-ratio:1/1;overflow:hidden;background:var(--light-sage);display:flex;align-items:center;justify-content:center;position:relative;}
+.p-img img{width:100%;height:100%;object-fit:cover;object-position:center;display:block;transition:transform .5s ease;position:absolute;inset:0;}
+.prod-card:hover .p-img img{transform:scale(1.05);}
+.p-img-ph{font-size:40px;opacity:.3;}
+.p-out-overlay{position:absolute;inset:0;background:rgba(61,43,26,.5);display:flex;align-items:center;justify-content:center;}
+.p-out-label{padding:6px 14px;background:var(--danger);color:white;font-size:9px;letter-spacing:2px;text-transform:uppercase;}
+.p-info{padding:12px 14px 14px;border-top:1px solid var(--sand);}
+.p-cat-tag{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--gold2);margin-bottom:3px;}
+.p-name{font-family:'Playfair Display',serif;font-size:15px;color:var(--espresso);line-height:1.2;margin-bottom:2px;}
+.p-name-th{font-size:11px;color:var(--brown);margin-bottom:8px;font-weight:300;}
+.p-bottom{display:flex;justify-content:space-between;align-items:center;gap:6px;}
+.p-price{font-family:'Playfair Display',serif;font-size:17px;color:var(--espresso);}
+.p-price small{font-size:10px;color:var(--brown);font-family:'Noto Sans Thai',sans-serif;}
+.p-status{font-size:8px;padding:2px 6px;letter-spacing:1px;text-transform:uppercase;flex-shrink:0;}
+.st-ok{border:1px solid var(--sage);color:var(--sage);}
+.st-low{border:1px solid var(--warn);color:var(--warn);}
+.st-out{border:1px solid var(--danger);color:var(--danger);}
+.st-pre{background:var(--espresso);color:var(--gold2);border:1px solid var(--gold2);font-weight:700;}
+.p-sku{font-size:8px;color:var(--sand2);letter-spacing:1px;margin-bottom:4px;}
+
+/* SALE PRICE */
+.p-price-wrap{display:flex;flex-direction:column;gap:1px;}
+.p-price-original{font-size:11px;color:var(--sand2);text-decoration:line-through;line-height:1;}
+.p-price-sale{font-family:'Playfair Display',serif;font-size:19px;color:var(--danger);line-height:1.1;}
+.p-price-sale small{font-size:10px;font-family:'Noto Sans Thai',sans-serif;color:var(--danger);}
+.p-price-normal{font-family:'Playfair Display',serif;font-size:19px;color:var(--espresso);}
+.p-price-normal small{font-size:10px;color:var(--brown);font-family:'Noto Sans Thai',sans-serif;}
+.sale-badge{background:var(--danger);color:white;font-size:8px;padding:2px 6px;letter-spacing:1px;flex-shrink:0;font-weight:700;}
+
+/* PREORDER CONTACT BTN */
+.preorder-btn{width:100%;padding:13px;background:var(--gold2);color:var(--espresso);border:none;font-family:'Noto Sans Thai',sans-serif;font-size:12px;letter-spacing:1px;cursor:pointer;border-radius:4px;font-weight:700;margin-bottom:8px;text-decoration:none;display:block;text-align:center;}
+
+/* MODAL PRICE */
+.modal-price-wrap{margin-bottom:14px;}
+.modal-price-orig{font-size:14px;color:var(--sand2);text-decoration:line-through;}
+.modal-price-sale{font-family:'Playfair Display',serif;font-size:32px;color:var(--danger);}
+.modal-price-normal{font-family:'Playfair Display',serif;font-size:32px;color:var(--espresso);}
+
+.empty-sec{padding:36px 20px;text-align:center;border:1.5px dashed var(--sand);color:var(--brown);font-size:13px;}
+
+/* LOADING */
+.loading-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 20px;gap:14px;}
+.spinner{width:32px;height:32px;border:2px solid var(--sand);border-top-color:var(--gold2);border-radius:50%;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading-text{font-size:12px;color:var(--brown);letter-spacing:1px;}
+
+/* MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(61,43,26,.8);z-index:500;opacity:0;pointer-events:none;transition:opacity .3s;display:flex;align-items:flex-end;justify-content:center;}
+.modal-bg.show{opacity:1;pointer-events:all;}
+.modal-sheet{background:var(--warm);width:100%;max-width:480px;max-height:90vh;overflow-y:auto;transform:translateY(100%);transition:transform .35s cubic-bezier(.25,.46,.45,.94);border-radius:16px 16px 0 0;}
+.modal-bg.show .modal-sheet{transform:translateY(0);}
+.modal-handle{width:40px;height:4px;background:var(--sand);border-radius:2px;margin:12px auto 0;}
+.modal-img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;background:var(--light-sage);}
+.modal-img-ph{width:100%;aspect-ratio:1/1;background:var(--light-sage);display:flex;align-items:center;justify-content:center;font-size:64px;opacity:.2;}
+/* GALLERY */
+.gallery-wrap{position:relative;overflow:hidden;background:var(--light-sage);}
+.gallery-track{display:flex;transition:transform .35s ease;}
+.gallery-slide{min-width:100%;aspect-ratio:1/1;object-fit:cover;display:block;}
+.gallery-dots{display:flex;justify-content:center;gap:6px;padding:8px 0;}
+.g-dot{width:6px;height:6px;border-radius:50%;background:var(--sand2);cursor:pointer;transition:background .2s;}
+.g-dot.active{background:var(--espresso);}
+.gallery-btn{position:absolute;top:50%;transform:translateY(-50%);background:rgba(61,43,26,.5);color:white;border:none;width:32px;height:32px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;z-index:10;}
+.gallery-btn.prev{left:8px;}
+.gallery-btn.next{right:8px;}
+.modal-body{padding:20px 20px 32px;}
+.modal-sku{font-size:9px;letter-spacing:3px;color:var(--gold2);text-transform:uppercase;margin-bottom:6px;}
+.modal-name{font-family:'Playfair Display',serif;font-size:26px;color:var(--espresso);line-height:1.1;margin-bottom:4px;}
+.modal-name-th{font-size:13px;color:var(--brown);margin-bottom:14px;}
+.modal-price{font-family:'Playfair Display',serif;font-size:32px;color:var(--espresso);margin-bottom:14px;}
+.modal-divider{height:1px;background:var(--sand);margin-bottom:14px;}
+.modal-status-row{display:flex;align-items:center;gap:10px;margin-bottom:20px;}
+.modal-close-btn{width:100%;padding:14px;background:var(--espresso);color:var(--warm);border:none;font-family:'Noto Sans Thai',sans-serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:4px;}
+
+/* FOOTER */
+.footer{background:var(--espresso);padding:36px 24px;text-align:center;}
+.footer-brand{font-family:'Playfair Display',serif;font-size:26px;color:var(--warm);letter-spacing:3px;margin-bottom:4px;}
+.footer-sub{font-size:8px;letter-spacing:3px;color:var(--gold);text-transform:uppercase;margin-bottom:20px;}
+.footer-contact{font-size:12px;color:var(--sand2);line-height:2;}
+.footer-divider{width:40px;height:1px;background:var(--gold);opacity:.4;margin:16px auto;}
+.footer-copy{font-size:10px;color:var(--sand2);opacity:.5;letter-spacing:1px;}
+
+/* CONFIG SCREEN - hidden for customers */
+#configScreen{display:none;}
+
+/* TOAST */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--espresso);color:var(--warm);padding:12px 22px;font-size:12px;border-left:3px solid var(--gold2);opacity:0;transition:all .4s;z-index:9000;white-space:nowrap;border-radius:2px;}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+
+/* DESKTOP ENHANCEMENTS */
+@media(min-width:600px){
+  .topbar{padding:14px 40px;}
+  .brand-name{font-size:24px;}
+  .hero{padding:70px 40px 60px;}
+  .catalog-wrap{padding:36px 40px 80px;}
+  .prod-grid{grid-template-columns:repeat(3,1fr);}
+  .p-name{font-size:17px;}
+  .modal-bg{align-items:center;}
+  .modal-sheet{border-radius:4px;max-height:85vh;}
+  .modal-img{aspect-ratio:1/1;}
+}
+@media(min-width:960px){
+  .prod-grid{grid-template-columns:repeat(6,1fr);}
+  .catalog-wrap{padding:40px 60px 100px;}
+  .topbar{padding:14px 60px;}
+  .hero{padding:90px 60px 70px;}
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="brand-wrap">
+    <div class="brand-name">Sense of Home</div>
+    <div class="brand-sub">ອະລັງການງານແຕ່ງບ້ານ</div>
+  </div>
+  <div class="topbar-right"></div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-label">✦ ຍິນດີຕ້ອນຮັບສູ່ຮ້ານຂອງພວກເຮົາ</div>
+  <h1 class="hero-title">Sense of<br><em>Home</em></h1>
+  <p class="hero-sub">ຄັດສັນສິນຄ້າເຄື່ອງເຟີນີເຈີ ແລະ ຂອງຕົກແຕ່ງບ້ານຄຸນນະພາບດີ ເພື່ອທຸກມຸມຂອງບ້ານທ່ານ</p>
+  <div class="hero-scroll">
+    <a href="#catalog" class="hero-scroll-btn">ເບິ່ງສິນຄ້າທັງໝົດ</a>
+  </div>
+  <div class="hero-deco">
+    <div class="hero-deco-line"></div>
+    <div class="hero-deco-dot">✦</div>
+    <div class="hero-deco-line"></div>
+  </div>
+</section>
+
+<!-- CAT NAV -->
+<nav class="cat-nav" id="catNav">
+  <div class="cat-tab active" onclick="filterCat('all',this)">ທັງໝົດ</div>
+  <div class="cat-tab" onclick="filterCat('ເຟີນີເຈີ',this)">ເຟີນີເຈີ</div>
+  <div class="cat-tab" onclick="filterCat('ຂອງຕົກແຕ່ງ',this)">ຂອງຕົກແຕ່ງ</div>
+  <div class="cat-tab" onclick="filterCat('ແສງສະຫວ່າງ',this)">ແສງສະຫວ່າງ</div>
+  <div class="cat-tab" onclick="filterCat('ຫ້ອງນອນ',this)">ຫ້ອງນອນ</div>
+  <div class="cat-tab" onclick="filterCat('ຫ້ອງຄົວ',this)">ຫ້ອງຄົວ</div>
+  <div class="cat-tab" onclick="filterCat('ຫ້ອງນ້ຳ',this)">ຫ້ອງນ້ຳ</div>
+  <div class="cat-tab" onclick="filterCat('ເຄື່ອງໃຊ້ໃນບ້ານ',this)">ເຄື່ອງໃຊ້ໃນບ້ານ</div>
+</nav>
+
+<!-- CATALOG -->
+<main id="catalog" class="catalog-wrap">
+  <div id="catalogContent">
+    <div class="loading-wrap">
+      <div class="spinner"></div>
+      <div class="loading-text">ກຳລັງໂຫຼດສິນຄ້າ...</div>
+    </div>
+  </div>
+</main>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-brand">Sense of Home</div>
+  <div class="footer-sub">ອະລັງການງານແຕ່ງບ້ານ</div>
+  <div class="footer-contact" id="footerContact">
+    📞 ຕິດຕໍ່ສອບຖາມ: <strong>020 5985 0932</strong><br>
+    📘 ເພຈ Facebook: <strong>SENSE OF HOME ອະລັງການງານແຕ່ງບ້ານ</strong>
+  </div>
+  <div class="footer-divider"></div>
+  <div class="footer-copy">© 2025 Sense of Home — ອະລັງການງານແຕ່ງບ້ານ</div>
+</footer>
+
+<!-- PRODUCT MODAL -->
+<div class="modal-bg" id="prodModal" onclick="if(event.target===this)closeModal()">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div id="modalImgWrap"></div>
+    <div class="modal-body">
+      <div class="modal-sku" id="mSku"></div>
+      <div class="modal-name" id="mName"></div>
+      <div class="modal-name-th" id="mNameTh"></div>
+      <div class="modal-price" id="mPrice"></div>
+      <div class="modal-divider"></div>
+      <div class="modal-status-row" id="mStatus"></div>
+      <button class="modal-close-btn" onclick="closeModal()">ປິດ</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const CATS  = ['ເຟີນີເຈີ','ຂອງຕົກແຕ່ງ','ແສງສະຫວ່າງ','ຫ້ອງນອນ','ຫ້ອງຄົວ','ຫ້ອງນ້ຳ','ເຄື່ອງໃຊ້ໃນບ້ານ'];
+const EMOJI = {'ເຟີນີເຈີ':'🛋️','ຂອງຕົກແຕ່ງ':'🪴','ແສງສະຫວ່າງ':'💡','ຫ້ອງນອນ':'🛏️','ຫ້ອງຄົວ':'🍳','ຫ້ອງນ້ຳ':'🚿','ເຄື່ອງໃຊ້ໃນບ້ານ':'🏠'};
+let products=[], stockMap={}, catFilter='all';
+
+function fmt(n){return Number(n||0).toLocaleString('th',{maximumFractionDigits:0});}
+function toDriveUrl(url){const m=(url||'').match(/\/d\/([a-zA-Z0-9_-]+)/);return m?`https://drive.google.com/thumbnail?id=${m[1]}&sz=w600`:url;}
+
+const SCRIPT_URL='https://script.google.com/macros/s/AKfycbzBdHxdnIrDNkO3o5V71aFLBv_1YuQYFTHyLG_y355cdChGxy0pJ016CxlRUAUxKMdN/exec';
+
+function init(){
+  loadData();
+}
+
+function loadData(){
+  // ສະແດງ loading
+  const grid=document.getElementById('catalogGrid');
+  if(grid) grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--brown);font-size:13px">⏳ ກຳລັງໂຫຼດ...</div>';
+
+  loadJsonp('getProducts', function(rP){
+    products=(rP&&rP.data)||[];
+    if(!products.length){
+      // retry ຄັ້ງດຽວຖ້າບໍ່ໄດ້ຂໍ້ມູນ
+      setTimeout(function(){
+        loadJsonp('getProducts', function(rP2){
+          products=(rP2&&rP2.data)||[];
+          loadJsonp('getStock', function(rS){ processStock(rS); });
+        });
+      }, 2000);
+      return;
+    }
+    loadJsonp('getStock', function(rS){ processStock(rS); });
+  });
+}
+
+function processStock(rS){
+  const sd=(rS&&rS.data)||{};
+  stockMap={};
+  if(Array.isArray(sd)){
+    sd.forEach(function(row){
+      var sku=row['SKU']||row.sku||'';
+      var qty=Number(row['ສະຕ໋ອກ']||row['Stock']||row.total||row.qty||0);
+      stockMap[sku]={qty:qty};
+    });
+  } else { stockMap=sd; }
+  renderCatalog();
+}
+
+function loadJsonp(action, cb){
+  const cbName='_cb_'+Math.random().toString(36).slice(2);
+  window[cbName]=function(data){
+    try{cb(data);}catch(e){console.log(e);}
+    delete window[cbName];
+    const s=document.getElementById(cbName);
+    if(s)s.remove();
+  };
+  const s=document.createElement('script');
+  s.id=cbName;
+  s.src=SCRIPT_URL+'?action='+encodeURIComponent(action)+'&callback='+cbName;
+  s.onerror=function(){
+    console.log('JSONP error:',action);
+    try{cb({});}catch(e){}
+    delete window[cbName];
+    s.remove();
+  };
+  document.head.appendChild(s);
+  setTimeout(function(){
+    if(window[cbName]){
+      console.log('JSONP timeout:',action);
+      try{cb({});}catch(e){}
+      delete window[cbName];
+      const el=document.getElementById(cbName);
+      if(el)el.remove();
+    }
+  }, 20000);
+}
+
+function api(payload){
+  return new Promise(function(resolve){
+    loadJsonp(payload.action+'&d='+encodeURIComponent(JSON.stringify(payload.data||{})), resolve);
+  });
+}
+
+function filterCat(cat,el){
+  catFilter=cat;
+  document.querySelectorAll('.cat-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  renderCatalog();
+  document.getElementById('catalog').scrollIntoView({behavior:'smooth'});
+}
+
+function renderCatalog(){
+  const wrap=document.getElementById('catalogContent');
+  if(!products.length){
+    wrap.innerHTML=`<div style="text-align:center;padding:80px 20px;color:var(--brown)">
+      <div style="font-size:52px;opacity:.2;margin-bottom:16px">🏠</div>
+      <div style="font-family:'Playfair Display',serif;font-size:24px;color:var(--espresso);margin-bottom:8px">ກຳລັງກຽມສິນຄ້າ</div>
+      <div style="font-size:13px">ກະລຸນາກັບມາໃໝ່ໃນໄວໆນີ້ເດີ້</div></div>`;
+    return;
+  }
+  const filtered=catFilter==='all'?products:products.filter(p=>(p.cat||p['ໝວດ']||p['ໝວດໝູ່'])===catFilter);
+  const cats=catFilter==='all'?CATS:[catFilter];
+  let html='';
+  cats.forEach(cat=>{
+    const items=filtered.filter(p=>(p.cat||p['ໝວດ']||p['ໝວດໝູ່'])===cat);
+    if(!items.length) return;
+    html+=`<div class="section-block">
+      <div class="section-head">
+        <div>
+          <div class="sec-label">✦ ${cat}</div>
+          <div class="sec-name">${EMOJI[cat]||''} <em>${cat}</em></div>
+        </div>
+        <div class="sec-count">${items.length} ລາຍການ</div>
+      </div>
+      <div class="prod-grid">
+      ${items.map(p=>{
+        const sku=p.sku||p['SKU']||'';
+        const nameTh=p.nameTh||p['ຊື່ສິນຄ້າ']||p['ຊື່ສິນຄ້າ (ລາວ)']||'';
+        const nameEn=p.nameEn||p['ชื่อสินค้า (EN)']||'';
+        const price=+p.price||+p['ລາຄາຂາຍ']||0;
+        const imgUrl=toDriveUrl(p.imgUrl||p['URL ຮູບ']||'');
+        const st=stockMap[sku]||{qty:0};
+        const qty=Number(st.qty||0);
+        const stInfo=qty===0?['st-out','ໝົດແລ້ວ']:qty<=3?['st-low','ໃກ້ໝົດ']:['st-ok','ມີສິນຄ້າ'];
+        const isPreorder=(p.preorder||p['preorder'])==='true'||p.preorder===true;
+        const salePrice=+p.salePrice||+p['ລາຄາຫຼຸດ']||0;
+        const statusBadge=isPreorder
+          ?`<span class="p-status st-pre">PREORDER</span>`
+          :`<span class="p-status ${stInfo[0]}">${stInfo[1]}</span>`;
+        const priceHtml=salePrice>0
+          ?`<div class="p-price-wrap">
+              <div class="p-price-original">₭${fmt(price)}</div>
+              <div class="p-price-sale">₭${fmt(salePrice)}<small> ກີບ</small></div>
+            </div>
+            <span class="sale-badge">ຫຼຸດ</span>`
+          :`<div class="p-price-normal">₭${fmt(price)}<small> ກີບ</small></div>`;
+        const imgEl=imgUrl
+          ?`<img src="${imgUrl}" alt="${nameTh}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\\'p-img-ph\\'>${EMOJI[cat]||'📦'}</div>'">`
+          :`<div class="p-img-ph">${EMOJI[cat]||'📦'}</div>`;
+        const outOverlay=qty===0&&!isPreorder?`<div class="p-out-overlay"><div class="p-out-label">ໝົດແລ້ວ</div></div>`:'';
+        const preOverlay=isPreorder?`<div class="p-out-overlay" style="background:rgba(61,43,26,.55)"><div class="p-out-label" style="background:var(--gold2);color:var(--espresso);border:none">PREORDER</div></div>`:'';
+        return`<div class="prod-card" onclick="openModal('${sku}')">
+          <div class="p-img">${imgEl}${outOverlay}${preOverlay}</div>
+          <div class="p-info">
+            <div class="p-sku">${sku}</div>
+            <div class="p-cat-tag">${cat}</div>
+            <div class="p-name">${nameEn||nameTh}</div>
+            <div class="p-name-th">${nameTh}</div>
+            <div class="p-bottom">
+              ${priceHtml}
+              ${statusBadge}
+            </div>
+          </div>
+        </div>`;
+      }).join('')}
+      </div>
+    </div>`;
+  });
+  wrap.innerHTML=html||`<div class="empty-sec">ບໍ່ມີສິນຄ້າໃນໝວດນີ້</div>`;
+}
+
+function openModal(sku){
+  const p=products.find(x=>(x.sku||x['SKU'])===sku);if(!p) return;
+  const nameTh=p.nameTh||p['ຊື່ສິນຄ້າ']||p['ຊື່ສິນຄ້າ (ລາວ)']||'';
+  const nameEn=p.nameEn||p['ชื่อสินค้า (EN)']||'';
+  const price=+p.price||+p['ລາຄາຂາຍ']||0;
+  const cat=p.cat||p['ໝວດ']||p['ໝວດໝູ່']||'';
+  const imgUrl=toDriveUrl(p.imgUrl||p['URL ຮູບ']||'');
+  const st=stockMap[sku]||{qty:0};
+  const qty=Number(st.qty||0);
+  const stInfo=qty===0?['st-out','ສິນຄ້າໝົດແລ້ວ']:qty<=3?['st-low','ເຫຼືອໜ້ອຍ']:['st-ok','ມີສິນຄ້າ'];
+  const isPreorder=(p.preorder||p['preorder'])==='true'||p.preorder===true;
+  const salePrice=+p.salePrice||+p['ລາຄາຫຼຸດ']||0;
+  document.getElementById('mSku').textContent=sku;
+  document.getElementById('mName').textContent=nameEn||nameTh;
+  document.getElementById('mNameTh').textContent=nameTh;
+
+  // Price display
+  const priceEl=document.getElementById('mPrice');
+  if(salePrice>0){
+    priceEl.className='modal-price-wrap';
+    priceEl.innerHTML=`<div class="modal-price-orig">₭${fmt(price)} ກີບ</div><div class="modal-price-sale">₭${fmt(salePrice)} ກີບ</div>`;
+  } else {
+    priceEl.className='modal-price-wrap';
+    priceEl.innerHTML=`<div class="modal-price-normal">₭${fmt(price)} ກີບ</div>`;
+  }
+
+  // Status
+  const statusHtml=isPreorder
+    ?`<span class="p-status st-pre" style="padding:4px 12px;font-size:11px">PREORDER</span>`
+    :`<span class="p-status ${stInfo[0]}" style="padding:4px 12px;border:1px solid currentColor;font-size:10px">${stInfo[1]}</span>`;
+  document.getElementById('mStatus').innerHTML=statusHtml;
+
+  // Action button
+  const closeBtn=document.querySelector('.modal-close-btn');
+  if(isPreorder){
+    closeBtn.insertAdjacentHTML('beforebegin',
+      `<a href="https://www.facebook.com/SenseOfHomeLao" target="_blank" class="preorder-btn">📩 ຕິດຕໍ່ສັ່ງຈອງ PREORDER</a>`);
+  } else {
+    document.querySelector('.preorder-btn')?.remove();
+  }
+  const imgs=[
+    toDriveUrl(p.imgUrl||p['URL ຮູບ']||''),
+    toDriveUrl(p.imgUrl2||p['URL ຮູບ 2']||''),
+    toDriveUrl(p.imgUrl3||p['URL ຮູບ 3']||''),
+    toDriveUrl(p.imgUrl4||p['URL ຮູບ 4']||'')
+  ].filter(u=>u);
+
+  const imgWrap=document.getElementById('modalImgWrap');
+  if(imgs.length===0){
+    imgWrap.innerHTML=`<div class="modal-img-ph">${EMOJI[cat]||'📦'}</div>`;
+  } else if(imgs.length===1){
+    imgWrap.innerHTML=`<img class="modal-img" src="${imgs[0]}" alt="${nameTh}" onerror="this.parentElement.innerHTML='<div class=\\'modal-img-ph\\'>${EMOJI[cat]||'📦'}</div>'">`;
+  } else {
+    let cur=0;
+    const slides=imgs.map((u,i)=>`<img class="gallery-slide" src="${u}" data-i="${i}" onerror="this.style.display='none'">`).join('');
+    const dots=imgs.map((_,i)=>`<div class="g-dot ${i===0?'active':''}" onclick="gotoSlide(${i})"></div>`).join('');
+    imgWrap.innerHTML=`
+      <div class="gallery-wrap" id="galleryWrap">
+        <button class="gallery-btn prev" onclick="gSlide(-1)">‹</button>
+        <div class="gallery-track" id="galleryTrack">${slides}</div>
+        <button class="gallery-btn next" onclick="gSlide(1)">›</button>
+      </div>
+      <div class="gallery-dots">${dots}</div>`;
+    window._gCur=0;window._gLen=imgs.length;
+  }
+  document.getElementById('prodModal').classList.add('show');
+  document.body.style.overflow='hidden';
+}
+
+function closeModal(){
+  document.getElementById('prodModal').classList.remove('show');
+  document.body.style.overflow='';
+}
+
+let tt;
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+// swipe to close modal
+let startY=0;
+document.querySelector('.modal-sheet')?.addEventListener('touchstart',e=>startY=e.touches[0].clientY);
+document.querySelector('.modal-sheet')?.addEventListener('touchend',e=>{if(e.changedTouches[0].clientY-startY>80)closeModal();});
+
+// gallery functions
+function gSlide(dir){
+  window._gCur=(window._gCur+dir+window._gLen)%window._gLen;
+  gotoSlide(window._gCur);
+}
+function gotoSlide(i){
+  window._gCur=i;
+  const t=document.getElementById('galleryTrack');
+  if(t)t.style.transform=`translateX(-${i*100}%)`;
+  document.querySelectorAll('.g-dot').forEach((d,j)=>d.classList.toggle('active',j===i));
+}
+
+// touch swipe gallery
+let _gTouchX=0;
+document.addEventListener('touchstart',function(e){
+  const wrap=document.getElementById('galleryWrap');
+  if(wrap&&wrap.contains(e.target)) _gTouchX=e.touches[0].clientX;
+},{ passive:true });
+document.addEventListener('touchend',function(e){
+  const wrap=document.getElementById('galleryWrap');
+  if(!wrap||!wrap.contains(e.target))return;
+  const dx=e.changedTouches[0].clientX-_gTouchX;
+  if(Math.abs(dx)>40) gSlide(dx<0?1:-1);
+},{ passive:true });
+
+init();
+</script>
+</body>
+</html>
