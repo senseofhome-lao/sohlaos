@@ -597,21 +597,28 @@ function goTab(id,el){
 }
 
 // API — fetch POST
+// ມີ timeout 25 ວິ + ລອງໃໝ່ 1 ເທື່ອ — ກັນໜ້າຄ້າງເມື່ອ Apps Script ບໍ່ຕອບ
+let apiFailed=false;
 async function callAPI(payload){
-  try{
-    const res=await fetch(SCRIPT_URL,{
-      method:'POST',
-      body:JSON.stringify(payload),
-      redirect:'follow',
-      headers:{'Content-Type':'text/plain'}
-    });
-    const d=await res.json();
-    document.getElementById('connDot').className='conn-dot ok';
-    return d;
-  }catch(e){
-    document.getElementById('connDot').className='conn-dot err';
-    return offlineHandler(payload);
+  for(let i=0;i<2;i++){
+    try{
+      const ctl=new AbortController();const t=setTimeout(()=>ctl.abort(),25000);
+      const res=await fetch(SCRIPT_URL,{
+        method:'POST',
+        body:JSON.stringify(payload),
+        redirect:'follow',
+        headers:{'Content-Type':'text/plain'},
+        signal:ctl.signal
+      });
+      clearTimeout(t);
+      const d=await res.json();
+      document.getElementById('connDot').className='conn-dot ok';
+      return d;
+    }catch(e){ if(i===0) await new Promise(z=>setTimeout(z,1500)); }
   }
+  apiFailed=true;
+  document.getElementById('connDot').className='conn-dot err';
+  return offlineHandler(payload);
 }
 
 function offlineHandler(p){
@@ -674,6 +681,9 @@ function genSKU(cat){
 }
 
 async function loadData(){
+  apiFailed=false;
+  const sg=document.getElementById('statsGrid');
+  if(sg)sg.innerHTML='<div style="grid-column:1/-1;padding:24px;text-align:center;opacity:.7">⏳ ກຳລັງໂຫຼດຂໍ້ມູນ... (ອາດໃຊ້ເວລາ 10–30 ວິນາທີ)</div>';
   const [rP,rL,rS,rSt,rC]=await Promise.all([
     callAPI({action:'getProducts'}),callAPI({action:'getLots'}),
     callAPI({action:'getSales'}),callAPI({action:'getStock'}),callAPI({action:'getCost'})
@@ -686,6 +696,16 @@ async function loadData(){
   if(Array.isArray(cd)){costMap={};cd.forEach(r=>{costMap[r['SKU']||r.sku]={costItem:Number(r['ລາຄາຊື້/ຊີ້ນ']||r.costItem||0),costShip:Number(r['ຄ່າສົ່ງ/ຊີ້ນ']||r.costShip||0),costOther:Number(r['ຄ່າອື່ນ/ຊີ້ນ']||r.costOther||0)};});}
   else costMap=cd;
   renderAll();
+  showLoadWarning();
+}
+
+function showLoadWarning(){
+  let w=document.getElementById('loadWarn');
+  if(!apiFailed){if(w)w.remove();return;}
+  if(!w){w=document.createElement('div');w.id='loadWarn';
+    w.style.cssText='position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:9999;background:#8b2e1f;color:#fff;padding:10px 16px;border-radius:6px;font-size:14px;box-shadow:0 4px 12px rgba(0,0,0,.25)';
+    document.body.appendChild(w);}
+  w.innerHTML='⚠️ ໂຫຼດຂໍ້ມູນຈາກ server ບໍ່ຄົບ — ຂໍ້ມູນທີ່ເຫັນອາດບໍ່ແມ່ນລ່າສຸດ <button onclick="loadData()" style="margin-left:10px;padding:4px 10px;border:0;border-radius:4px;cursor:pointer">🔄 ໂຫຼດໃໝ່</button>';
 }
 
 function renderAll(){renderStats();renderProdList();renderLotList();renderSales();prvSKU();populateLotSkuSelect();}
