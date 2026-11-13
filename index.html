@@ -254,7 +254,7 @@ let products=[], stockMap={}, catFilter='all';
 function fmt(n){return Number(n||0).toLocaleString('th',{maximumFractionDigits:0});}
 function toDriveUrl(url){const m=(url||'').match(/\/d\/([a-zA-Z0-9_-]+)/);return m?`https://drive.google.com/thumbnail?id=${m[1]}&sz=w600`:url;}
 
-const SCRIPT_URL='https://script.google.com/macros/s/AKfycbxk9R5zk3Rfu2ZHnOHmpKYfwtpO5sfc_pmErHuBHgoJxYjqU17mgn3MWDcLV49XtQwb/exec';
+const SCRIPT_URL='https://script.google.com/macros/s/AKfycbzBdHxdnIrDNkO3o5V71aFLBv_1YuQYFTHyLG_y355cdChGxy0pJ016CxlRUAUxKMdN/exec';
 
 function init(){
   loadData();
