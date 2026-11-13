@@ -695,8 +695,22 @@ async function loadData(){
   const cd=rC.data||{};
   if(Array.isArray(cd)){costMap={};cd.forEach(r=>{costMap[r['SKU']||r.sku]={costItem:Number(r['ລາຄາຊື້/ຊີ້ນ']||r.costItem||0),costShip:Number(r['ຄ່າສົ່ງ/ຊີ້ນ']||r.costShip||0),costOther:Number(r['ຄ່າອື່ນ/ຊີ້ນ']||r.costOther||0)};});}
   else costMap=cd;
+  syncStockFromLots();
   renderAll();
   showLoadWarning();
+}
+
+// ສະຕ໋ອກສຳຮອງ: ຄິດຈາກຈຳນວນ "ຄ້າງ" ໃນ Lot — ໃຊ້ເມື່ອ getStock ໄດ້ 0 ຫຼື ບໍ່ມີ
+function syncStockFromLots(){
+  const left={};
+  lots.forEach(l=>{const k=l['SKU']||l.sku;if(!k)return;
+    const q=(l['ຄ້າງ']!==undefined&&l['ຄ້າງ']!=='')?+l['ຄ້າງ']:(+l.left||0);
+    left[k]=(left[k]||0)+(q||0);});
+  Object.entries(left).forEach(([k,q])=>{
+    const cur=stockMap[k]||{qty:0,minQty:3};
+    if(q>Number(cur.qty||0))stockMap[k]={...cur,qty:q};
+  });
+  products.forEach(p=>{const k=p.sku||p['SKU'];if(k&&!stockMap[k])stockMap[k]={qty:0,minQty:3};});
 }
 
 function showLoadWarning(){
@@ -1046,7 +1060,8 @@ function addToCart(){
   // ກວດສະຕ໋ອກ
   const inCart=cart.filter(c=>c.sku===sku).reduce((s,c)=>s+c.qty,0);
   if(qty+inCart>Number(st.qty||0)){
-    toast(`⚠️ ສະຕ໋ອກເຫຼືອ ${st.qty||0} ຊີ້ນ (ໃນກະຕ່າ ${inCart} ແລ້ວ)`);return;
+    // ບໍ່ບລັອກ — ໃຫ້ຢືນຢັນ ແລ້ວຂາຍຕໍ່ໄດ້ (ກໍລະນີສະຕ໋ອກໃນລະບົບບໍ່ຖືກ)
+    if(!confirm(`ລະບົບສະແດງສະຕ໋ອກ ${st.qty||0} ຊີ້ນ (ໃນກະຕ່າ ${inCart} ແລ້ວ).\nຂາຍຕໍ່ຢູ່ບໍ່?`))return;
   }
 
   // ຖ້າ SKU ນີ້ຢູ່ໃນກະຕ່າແລ້ວ ໃຫ້ update
