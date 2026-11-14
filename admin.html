@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="lo">
+<html lang="th">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -178,6 +178,37 @@ body{background:var(--cream);font-family:'Noto Sans Thai',sans-serif;color:var(-
 .cfg-box{background:var(--warm);padding:28px 24px;width:min(340px,90vw);}
 .cfg-title{font-family:'Playfair Display',serif;font-size:20px;color:var(--espresso);margin-bottom:16px;}
 
+
+/* CART */
+.cart-item{background:var(--warm);border:1px solid var(--sand);padding:10px 12px;margin-bottom:6px;display:flex;align-items:center;gap:10px;}
+.cart-item-info{flex:1;min-width:0;}
+.cart-item-name{font-weight:500;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cart-item-sub{font-size:11px;color:var(--brown);}
+.cart-item-price{font-family:"Playfair Display",serif;font-size:16px;color:var(--espresso);flex-shrink:0;}
+
+
+
+/* REPORT */
+.rpt-card{background:var(--warm);border:1px solid var(--sand);padding:14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;}
+.rpt-name{font-weight:500;font-size:13px;color:var(--espresso);}
+.rpt-sub{font-size:10px;color:var(--brown);margin-top:2px;}
+.rpt-val{font-family:"Playfair Display",serif;font-size:18px;color:var(--espresso);text-align:right;}
+.rpt-val small{font-size:10px;color:var(--brown);font-family:"Noto Sans Thai",sans-serif;}
+.rpt-summary{background:var(--espresso);padding:14px 16px;display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:16px;}
+.rpt-s-label{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--sand);margin-bottom:3px;}
+.rpt-s-val{font-family:"Playfair Display",serif;font-size:20px;color:var(--warm);}
+.rpt-s-val.g{color:#7ec89e;}
+.rpt-badge{display:inline-block;padding:2px 8px;font-size:9px;border-radius:10px;background:var(--gold2);color:var(--espresso);font-weight:700;}
+
+/* EDIT PRODUCT MODAL */
+#editModal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:flex-end;justify-content:center;z-index:600;opacity:0;pointer-events:none;transition:opacity .3s;}
+#editModal.show{opacity:1;pointer-events:all;}
+.edit-sheet{background:var(--warm);width:100%;max-width:520px;max-height:90vh;overflow-y:auto;border-radius:16px 16px 0 0;transform:translateY(100%);transition:transform .35s;}
+#editModal.show .edit-sheet{transform:translateY(0);}
+.edit-handle{width:40px;height:4px;background:var(--sand);border-radius:2px;margin:12px auto 8px;}
+.edit-body{padding:16px 20px 32px;}
+.edit-title{font-family:"Playfair Display",serif;font-size:20px;color:var(--espresso);margin-bottom:16px;}
+
 /* TOAST */
 .toast{position:fixed;bottom:76px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--espresso);color:var(--warm);padding:11px 20px;font-size:12px;border-left:3px solid var(--gold2);opacity:0;transition:all .4s;z-index:8000;white-space:nowrap;border-radius:2px;}
 .toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
@@ -216,8 +247,7 @@ body{background:var(--cream);font-family:'Noto Sans Thai',sans-serif;color:var(-
     <div class="login-label">ລະຫັດຜ່ານ Admin</div>
     <input class="login-input" type="password" id="loginPwd" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
     <button class="login-btn" onclick="doLogin()">ເຂົ້າສູ່ລະບົບ</button>
-    
-    <span class="login-back"><a href="index.html">← ກັບໄປໜ້າລູກຄ້າ</a></span>
+    <span class="login-back"><a href="?">← ກັບໄປໜ້າລູກຄ້າ</a></span>
   </div>
 </div>
 
@@ -255,6 +285,7 @@ body{background:var(--cream);font-family:'Noto Sans Thai',sans-serif;color:var(-
           <option>ເຟີນີເຈີ</option><option>ຂອງຕົກແຕ່ງ</option>
           <option>ແສງສະຫວ່າງ</option><option>ຫ້ອງນອນ</option>
           <option>ຫ້ອງຄົວ</option><option>ຫ້ອງນ້ຳ</option>
+          <option>ເຄື່ອງໃຊ້ໃນບ້ານ</option>
         </select>
       </div>
       <div class="fg"><label class="fl">ລະຫັດສິນຄ້າ (ອັດຕະໂນມັດ)</label>
@@ -275,11 +306,23 @@ body{background:var(--cream);font-family:'Noto Sans Thai',sans-serif;color:var(-
       </div>
     </div>
     <div class="fg">
-      <label class="fl">URL ຮູບພາບ</label>
+      <label class="fl">URL ຮູບ 1 (ຫຼັກ) *</label>
       <div class="fhint">Google Drive: ແຊຣໄຟລ໌ → Copy link</div>
-      <input class="fi" id="pImg" placeholder="https://drive.google.com/..." oninput="prvImg()" style="margin-top:5px">
-      <img id="imgPrv" style="display:none;width:80px;height:80px;object-fit:cover;border:1px solid var(--sand);margin-top:6px">
+      <input class="fi" id="pImg" placeholder="https://drive.google.com/..." oninput="prvImgs()" style="margin-top:5px">
     </div>
+    <div class="fg">
+      <label class="fl">URL ຮູບ 2</label>
+      <input class="fi" id="pImg2" placeholder="https://drive.google.com/..." oninput="prvImgs()">
+    </div>
+    <div class="fg">
+      <label class="fl">URL ຮູບ 3</label>
+      <input class="fi" id="pImg3" placeholder="https://drive.google.com/..." oninput="prvImgs()">
+    </div>
+    <div class="fg">
+      <label class="fl">URL ຮູບ 4</label>
+      <input class="fi" id="pImg4" placeholder="https://drive.google.com/..." oninput="prvImgs()">
+    </div>
+    <div id="imgPrvStrip" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px"></div>
     <div class="divider"></div>
     <div class="sec-title">✦ ຕົ້ນທຶນຕໍ່ຊີ້ນ</div>
     <div class="g2">
@@ -299,41 +342,43 @@ body{background:var(--cream);font-family:'Noto Sans Thai',sans-serif;color:var(-
 
   <!-- TAB: LOT -->
   <div class="a-sec" id="tabLot">
-    <div class="sec-title">✦ ບັນທຶກລ໋ອດສັ່ງຊື້</div>
-    <p style="font-size:12px;color:var(--brown);margin-bottom:14px;line-height:1.8">ປ້ອນຂໍ້ມູນລ໋ອດ → ກົດ "ນຳໄປໃຊ້" ເພື່ອສົ່ງຕົ້ນທຶນໄປຟອມເພີ່ມສິນຄ້າ</p>
-    <div class="fg"><label class="fl">ຊື່ລ໋ອດ</label><input class="fi" id="lN" placeholder="ຕົວຢ່າງ: ລ໋ອດຈີນ ເດືອນ 4 ປີ 68"></div>
-    <div class="g2">
-      <div class="fg"><label class="fl">ຈຳນວນ (ຊີ້ນ)</label><input class="fi" id="lQ" type="number" placeholder="0" oninput="calcLot()"></div>
-      <div class="fg"><label class="fl">ວັນທີ່ຮັບ</label><input class="fi" id="lD" type="date"></div>
+    <div class="sec-title">✦ ເພີ່ມ Lot ສິນຄ້າ</div>
+    <p style="font-size:12px;color:var(--brown);margin-bottom:14px;line-height:1.8">ເລືອກສິນຄ້າ → ໃສ່ຈຳນວນ + ຕົ້ນທຶນ → ສ້າງ Lot ໃໝ່ (FIFO)</p>
+
+    <div class="fg">
+      <label class="fl">ສິນຄ້າ *</label>
+      <select class="fs" id="lSku" onchange="calcLot()"><option value="">— ເລືອກສິນຄ້າ —</option></select>
     </div>
     <div class="g2">
-      <div class="fg"><label class="fl">ລາຄາຊື້ລວມ (₭)</label><input class="fi" id="lB" type="number" placeholder="0" oninput="calcLot()"></div>
-      <div class="fg"><label class="fl">ຄ່າສົ່ງລວມ (₭)</label><input class="fi" id="lS" type="number" placeholder="0" oninput="calcLot()"></div>
+      <div class="fg"><label class="fl">ຈຳນວນ (ຊີ້ນ) *</label><input class="fi" id="lQ" type="number" placeholder="0" min="1" oninput="calcLot()"></div>
+      <div class="fg"><label class="fl">ວັນທີ່ຊື້</label><input class="fi" id="lD" type="date"></div>
     </div>
-    <div class="fg"><label class="fl">ຄ່າອື່ນໆ ລວມ (₭)</label><div class="fhint">ພາສີ, agent, ຄ່າກວດ</div><input class="fi" id="lF" type="number" placeholder="0" oninput="calcLot()"></div>
+    <div class="g2">
+      <div class="fg"><label class="fl">ລາຄາຊື້/ຊີ້ນ (₭) *</label><input class="fi hl" id="lCostItem" type="number" placeholder="0" oninput="calcLot()"></div>
+      <div class="fg"><label class="fl">ຄ່າສົ່ງ/ຊີ້ນ (₭)</label><input class="fi" id="lCostShip" type="number" placeholder="0" oninput="calcLot()"></div>
+    </div>
+    <div class="fg"><label class="fl">ຄ່າອື່ນໆ/ຊີ້ນ (₭)</label><div class="fhint">ພາສີ, agent ແບ່ງຕໍ່ຊີ້ນ</div><input class="fi" id="lCostOther" type="number" placeholder="0" oninput="calcLot()"></div>
     <div class="cost-box" style="grid-template-columns:repeat(3,1fr)">
       <div><div class="cb-label">ລາຄາຊື້/ຊີ້ນ</div><div class="cb-val" id="lBP">₭ —</div></div>
       <div><div class="cb-label">ຄ່າສົ່ງ+ອື່ນ/ຊີ້ນ</div><div class="cb-val" id="lSP" style="color:var(--gold2)">₭ —</div></div>
       <div><div class="cb-label">ຕົ້ນທຶນລວມ/ຊີ້ນ</div><div class="cb-val" id="lTP">₭ —</div></div>
     </div>
-    <button class="btn-p" onclick="addLot()">+ ບັນທຶກລ໋ອດ</button>
+    <button class="btn-p" onclick="addLot()">+ ເພີ່ມ Lot ໃໝ່</button>
     <div class="divider"></div>
-    <div class="sec-title">✦ ປະຫວັດລ໋ອດ</div>
+    <div class="sec-title">✦ ປະຫວັດ Lot ທັງໝົດ</div>
     <div id="lotList"></div>
   </div>
 
-  <!-- TAB: SALE -->
+  <!-- TAB: SALE (Cart) -->
   <div class="a-sec" id="tabSale">
-    <div class="sec-title">✦ ບັນທຶກການຂາຍ</div>
-    <div class="fg"><label class="fl">ສິນຄ້າ (SKU)</label>
-      <select class="fs" id="sProd" onchange="calcSPv()"><option value="">— ເລືອກສິນຄ້າ —</option></select>
+    <div class="sec-title">✦ ຂໍ້ມູນລູກຄ້າ</div>
+    <div class="fg"><label class="fl">ຊື່ລູກຄ້າ</label><input class="fi" id="sCN" placeholder="ທ້າວ/ນາງ ສົມໃຈ"></div>
+    <div class="g2">
+      <div class="fg"><label class="fl">ເບີໂທລະສັບ</label><input class="fi" id="sCP" placeholder="020-xxxx-xxxx"></div>
+      <div class="fg"><label class="fl">ທີ່ຢູ່</label><input class="fi" id="sCA" placeholder="ບ້ານ..."></div>
     </div>
     <div class="g2">
-      <div class="fg"><label class="fl">ຈຳນວນ (ຊີ້ນ)</label><input class="fi" id="sQ" type="number" value="1" min="1" oninput="calcSPv()"></div>
-      <div class="fg"><label class="fl">ລາຄາຂາຍຈິງ/ຊີ້ນ</label><div class="fhint">ຫວ່າງ = ລາຄາປົກກະຕິ</div><input class="fi" id="sP" type="number" placeholder="ລາຄາປົກກະຕິ" oninput="calcSPv()"></div>
-    </div>
-    <div class="g2">
-      <div class="fg"><label class="fl">ສ່ວນຫຼຸດ (₭)</label><input class="fi" id="sD" type="number" placeholder="0" value="0" oninput="calcSPv()"></div>
+      <div class="fg"><label class="fl">ວັນທີ່</label><input class="fi" id="sDate" type="date"></div>
       <div class="fg"><label class="fl">ຊ່ອງທາງ</label>
         <select class="fs" id="sCh">
           <option value="direct">ໜ້າຮ້ານ</option>
@@ -342,24 +387,46 @@ body{background:var(--cream);font-family:'Noto Sans Thai',sans-serif;color:var(-
         </select>
       </div>
     </div>
-    <div class="fg"><label class="fl">ວັນທີ່</label><input class="fi" id="sDate" type="date"></div>
+    <div class="fg"><label class="fl">ໝາຍເຫດ</label><input class="fi" id="sNote" placeholder="..."></div>
+
     <div class="divider"></div>
-    <div class="sec-title">✦ ຂໍ້ມູນລູກຄ້າ (ສຳລັບໃບບິນ)</div>
-    <div class="fg"><label class="fl">ຊື່ລູກຄ້າ</label><input class="fi" id="sCN" placeholder="ຕົວຢ່າງ: ທ້າວ/ນາງ ສົມໃຈ"></div>
-    <div class="g2">
-      <div class="fg"><label class="fl">ເບີໂທລະສັບ</label><input class="fi" id="sCP" placeholder="020-xxxx-xxxx"></div>
-      <div class="fg"><label class="fl">ທີ່ຢູ່ຈັດສົ່ງ</label><input class="fi" id="sCA" placeholder="ບ້ານ..."></div>
+    <div class="sec-title">✦ ກະຕ່າສິນຄ້າ</div>
+
+    <!-- Add item row -->
+    <div style="display:flex;gap:8px;margin-bottom:8px;align-items:flex-end">
+      <div style="flex:2">
+        <div class="fl" style="margin-bottom:4px">ສິນຄ້າ</div>
+        <select class="fs" id="sProd" onchange="onProdSelect()"><option value="">— ເລືອກ —</option></select>
+      </div>
+      <div style="flex:1">
+        <div class="fl" style="margin-bottom:4px">ຈຳນວນ</div>
+        <input class="fi" id="sQ" type="number" value="1" min="1" oninput="updateAutoDisc()">
+      </div>
+      <div style="flex:1">
+        <div class="fl" style="margin-bottom:4px">ລາຄາ/ຊີ້ນ</div>
+        <input class="fi" id="sP" type="number" placeholder="ປົກກະຕິ">
+      </div>
+      <div style="flex:1">
+        <div class="fl" style="margin-bottom:4px">ສ່ວນຫຼຸດ</div>
+        <input class="fi" id="sD" type="number" placeholder="0" value="0">
+      </div>
+      <button class="btn-g" onclick="addToCart()" style="width:auto;padding:11px 14px;margin-bottom:0;white-space:nowrap">+ ເພີ່ມ</button>
     </div>
-    <div class="fg"><label class="fl">ໝາຍເຫດ</label><input class="fi" id="sNote" placeholder="ຕົວຢ່າງ: ລູກຄ້າປະຈຳ, ຫຼຸດພິເສດ"></div>
-    <div class="sale-preview">
-      <div><div class="sp-label">ລາຍຮັບສຸດທິ</div><div class="sp-val" id="spR">₭ —</div></div>
-      <div><div class="sp-label">ສ່ວນຫຼຸດ</div><div class="sp-val" id="spD">₭ 0</div></div>
-      <div><div class="sp-label">ກຳໄລ</div><div class="sp-val" id="spP">₭ —</div></div>
-      <div><div class="sp-label">ສະຕ໋ອກຫຼັງຂາຍ</div><div class="sp-val" id="spS">—</div></div>
+
+    <!-- Cart list -->
+    <div id="cartList" style="margin-bottom:12px"></div>
+
+    <!-- Cart summary -->
+    <div class="sale-preview" id="cartSummary" style="display:none">
+      <div><div class="sp-label">ລາຍຮັບລວມ</div><div class="sp-val" id="cartTotal">₭ 0</div></div>
+      <div><div class="sp-label">ສ່ວນຫຼຸດລວມ</div><div class="sp-val" id="cartDisc">₭ 0</div></div>
+      <div><div class="sp-label">ສຸດທິ</div><div class="sp-val" id="cartNet">₭ 0</div></div>
+      <div><div class="sp-label">ລາຍການ</div><div class="sp-val" id="cartCount">0</div></div>
     </div>
-    <button class="btn-p" onclick="addSale(false)">✓ ບັນທຶກການຂາຍ</button>
-    <button class="btn-g" onclick="addSale(true)">🖨️ ບັນທຶກ &amp; ພິມໃບບິນ</button>
-    <button class="btn-s" onclick="clrSale()" style="width:100%">ລ້າງ</button>
+
+    <button class="btn-p" id="btnCheckout" onclick="checkout(false)" style="display:none">✓ ບັນທຶກການຂາຍ</button>
+    <button class="btn-g" id="btnCheckoutPrint" onclick="checkout(true)" style="display:none">🖨️ ບັນທຶກ &amp; ພິມໃບບິນ</button>
+    <button class="btn-s" onclick="clrSale()" style="width:100%">ລ້າງກະຕ່າ</button>
   </div>
 
   <!-- TAB: HISTORY -->
@@ -376,16 +443,66 @@ body{background:var(--cream);font-family:'Noto Sans Thai',sans-serif;color:var(-
     <div id="salesList"></div>
   </div>
 
+
+  <!-- TAB: REPORT -->
+  <div class="a-sec" id="tabReport">
+    <div class="sec-title">✦ ສະຫຼຸບຕົ້ນທຶນ Lot</div>
+    <div id="reportLots"></div>
+
+    <div class="divider"></div>
+    <div class="sec-title">✦ ສິນຄ້າຂາຍດີ</div>
+    <div id="reportTopProducts"></div>
+
+    <div class="divider"></div>
+    <div class="sec-title">✦ ກາຟ ຕົ້ນທຶນ vs ລາຍຮັບ</div>
+    <canvas id="reportChart" style="width:100%;max-height:300px"></canvas>
+  </div>
 </div><!-- end mainContent -->
 
 <!-- BOTTOM TABS -->
 <nav class="admin-tabs-bar">
   <div class="at active" onclick="goTab('tabOverview',this)"><span class="at-icon">📊</span>ພາບລວມ</div>
   <div class="at" onclick="goTab('tabAdd',this)"><span class="at-icon">➕</span>ສິນຄ້າ</div>
-  <div class="at" onclick="goTab('tabLot',this)"><span class="at-icon">📦</span>ລ໋ອດ</div>
+  <div class="at" onclick="goTab('tabLot',this);populateLotSkuSelect()"><span class="at-icon">📦</span>ລ໋ອດ</div>
   <div class="at" onclick="goTab('tabSale',this);populateSaleSelect()"><span class="at-icon">🧾</span>ຂາຍ</div>
   <div class="at" onclick="goTab('tabHistory',this)"><span class="at-icon">📋</span>ປະຫວັດ</div>
+  <div class="at" onclick="goTab('tabReport',this);renderReport()"><span class="at-icon">📈</span>ລາຍງານ</div>
 </nav>
+
+<!-- EDIT PRODUCT MODAL -->
+<div id="editModal">
+  <div class="edit-sheet">
+    <div class="edit-handle"></div>
+    <div class="edit-body">
+      <div class="edit-title">✏️ ແກ້ໄຂສິນຄ້າ</div>
+      <input type="hidden" id="editSku">
+      <div class="fg"><label class="fl">ຊື່ສິນຄ້າ (ລາວ)</label><input class="fi" id="editName" placeholder="ຊື່ສິນຄ້າ"></div>
+      <div class="fg"><label class="fl">ຊື່ສິນຄ້າ (EN)</label><input class="fi" id="editNameEn" placeholder="English name"></div>
+      <div class="fg"><label class="fl">ລາຄາຂາຍ (ກີບ)</label><input class="fi hl" id="editPrice" type="number" placeholder="0"></div>
+      <div class="fg"><label class="fl">ລາຄາຫຼຸດ (ກີບ)</label><div class="fhint">0 = ບໍ່ມີ</div><input class="fi" id="editSalePrice" type="number" placeholder="0"></div>
+      <div class="fg"><label class="fl">ໝວດໝູ່</label>
+        <select class="fs" id="editCat">
+          <option>ເຟີນີເຈີ</option><option>ຂອງຕົກແຕ່ງ</option>
+          <option>ແສງສະຫວ່າງ</option><option>ຫ້ອງນອນ</option>
+          <option>ຫ້ອງຄົວ</option><option>ຫ້ອງນ້ຳ</option>
+          <option>ເຄື່ອງໃຊ້ໃນບ້ານ</option>
+        </select>
+      </div>
+      <div class="fg"><label class="fl">URL ຮູບ 1</label><input class="fi" id="editImg1" placeholder="https://drive.google.com/..."></div>
+      <div class="fg"><label class="fl">URL ຮູບ 2</label><input class="fi" id="editImg2" placeholder="https://drive.google.com/..."></div>
+      <div class="fg"><label class="fl">URL ຮູບ 3</label><input class="fi" id="editImg3" placeholder="https://drive.google.com/..."></div>
+      <div class="fg"><label class="fl">URL ຮູບ 4</label><input class="fi" id="editImg4" placeholder="https://drive.google.com/..."></div>
+      <div class="fg"><label class="fl">ສະຖານະ</label>
+        <select class="fs" id="editPreorder">
+          <option value="false">ປົກກະຕິ</option>
+          <option value="true">PREORDER</option>
+        </select>
+      </div>
+      <button class="btn-g" onclick="saveEditProduct()" style="margin-top:8px">✓ ບັນທຶກການແກ້ໄຂ</button>
+      <button class="btn-s" onclick="closeEditModal()" style="width:100%;margin-top:6px">ຍົກເລີກ</button>
+    </div>
+  </div>
+</div>
 
 <!-- INVOICE MODAL -->
 <div id="invoiceModal">
@@ -411,10 +528,11 @@ body{background:var(--cream);font-family:'Noto Sans Thai',sans-serif;color:var(-
 
 <div class="toast" id="toast"></div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <script>
-const CATS=['ເຟີນີເຈີ','ຂອງຕົກແຕ່ງ','ແສງສະຫວ່າງ','ຫ້ອງນອນ','ຫ້ອງຄົວ','ຫ້ອງນ້ຳ'];
-const EMOJI={'ເຟີນີເຈີ':'🛋️','ຂອງຕົກແຕ່ງ':'🪴','ແສງສະຫວ່າງ':'💡','ຫ້ອງນອນ':'🛏️','ຫ້ອງຄົວ':'🍳','ຫ້ອງນ້ຳ':'🚿'};
-const SKU_PFX={'ເຟີນີເຈີ':'FN','ຂອງຕົກແຕ່ງ':'DC','ແສງສະຫວ່າງ':'LT','ຫ້ອງນອນ':'BD','ຫ້ອງຄົວ':'KT','ຫ້ອງນ້ຳ':'BT'};
+const CATS=['ເຟີນີເຈີ','ຂອງຕົກແຕ່ງ','ແສງສະຫວ່າງ','ຫ້ອງນອນ','ຫ້ອງຄົວ','ຫ້ອງນ້ຳ','ເຄື່ອງໃຊ້ໃນບ້ານ'];
+const EMOJI={'ເຟີນີເຈີ':'🛋️','ຂອງຕົກແຕ່ງ':'🪴','ແສງສະຫວ່າງ':'💡','ຫ້ອງນອນ':'🛏️','ຫ້ອງຄົວ':'🍳','ຫ້ອງນ້ຳ':'🚿','ເຄື່ອງໃຊ້ໃນບ້ານ':'🏠'};
+const SKU_PFX={'ເຟີນີເຈີ':'FN','ຂອງຕົກແຕ່ງ':'DC','ແສງສະຫວ່າງ':'LT','ຫ້ອງນອນ':'BD','ຫ້ອງຄົວ':'KT','ຫ້ອງນ້ຳ':'BT','ເຄື່ອງໃຊ້ໃນບ້ານ':'HH'};
 const CH_LBL={direct:'ໜ້າຮ້ານ',online:'ອອນໄລນ໌',other:'ອື່ນໆ'};
 const CH_CLS={direct:'ch-d',online:'ch-o',other:'ch-x'};
 
@@ -426,20 +544,31 @@ function today(){return new Date().toISOString().slice(0,10);}
 function fmt(n){return Number(n||0).toLocaleString('th',{maximumFractionDigits:0});}
 function toDrive(url){const m=(url||'').match(/\/d\/([a-zA-Z0-9_-]+)/);return m?`https://drive.google.com/thumbnail?id=${m[1]}&sz=w400`:url;}
 
-// INIT
 function init(){
   document.getElementById('sDate').value=today();
   document.getElementById('lD').value=today();
 }
 
+const SCRIPT_URL='https://script.google.com/macros/s/AKfycbzBdHxdnIrDNkO3o5V71aFLBv_1YuQYFTHyLG_y355cdChGxy0pJ016CxlRUAUxKMdN/exec';
+
 // LOGIN
 async function doLogin(){
-  const p=document.getElementById('loginPwd').value;
-  if(!p){document.getElementById('loginErr').textContent='ກະລຸນາໃສ່ລະຫັດຜ່ານ';return;}
-  document.getElementById('loginErr').textContent='ກຳລັງກວດສອບ...';
+  const p=document.getElementById('loginPwd').value.trim();
+  const err=document.getElementById('loginErr');
+  if(!p){err.textContent='ກະລຸນາໃສ່ລະຫັດຜ່ານ';return;}
+  err.textContent='ກຳລັງກວດສອບ...';
+  // ກວດກັບ server ໂດຍກົງ (ບໍ່ຜ່ານ offline) + ລອງໃໝ່ 2 ເທື່ອ ຖ້າເຊື່ອມຕໍ່ບໍ່ໄດ້
+  let r=null;
+  for(let i=0;i<3&&!r;i++){
+    try{
+      const ctl=new AbortController();const t=setTimeout(()=>ctl.abort(),20000);
+      const res=await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify({action:'checkPass',data:{pass:p}}),redirect:'follow',headers:{'Content-Type':'text/plain'},signal:ctl.signal});
+      clearTimeout(t);r=await res.json();
+    }catch(e){if(i<2){err.textContent='ກຳລັງເຊື່ອມຕໍ່ໃໝ່... ('+(i+2)+'/3)';await new Promise(z=>setTimeout(z,1500));}}
+  }
+  if(!r){err.textContent='⚠️ ເຊື່ອມຕໍ່ server ບໍ່ໄດ້ — ລະຫັດອາດຖືກແລ້ວ, ກວດອິນເຕີເນັດ ແລ້ວລອງໃໝ່';return;}
   try{
-    const r=await api({action:'checkPass',data:{pass:p}});
-    if(r&&r.valid){
+    if(r.valid){
       PASS=p;
       document.getElementById('loginScreen').classList.add('hidden');
       loadData();
@@ -449,7 +578,7 @@ async function doLogin(){
       document.getElementById('loginPwd').focus();
     }
   }catch(e){
-    document.getElementById('loginErr').textContent='❌ ເຊື່ອມຕໍ່ບໍ່ໄດ້ ລອງໃໝ່';
+    document.getElementById('loginErr').textContent='❌ ເຊື່ອມຕໍ່ບໍ່ໄດ້';
   }
 }
 function doLogout(){
@@ -457,9 +586,6 @@ function doLogout(){
   document.getElementById('loginPwd').value='';
   document.getElementById('loginErr').textContent='';
 }
-
-// CONFIG
-// Config handled in Code.gs
 
 // TABS
 function goTab(id,el){
@@ -470,42 +596,29 @@ function goTab(id,el){
   window.scrollTo(0,0);
 }
 
-// API
-const SCRIPT_URL='https://script.google.com/macros/s/AKfycbzrkmjUhHCviwpx3097srwqKr8HL6Y4ARolf8CeLCVbZ3H99B2zKEMHxgd7tKOHpxJ5/exec';
-
-async function api(payload){
-  const action = payload.action;
-  const data   = payload.data || {};
-  // ສ້າງ URL params ແຍກກັນ
-  const params = new URLSearchParams();
-  params.set('action', action);
-  // ສົ່ງ data fields ທີ່ສຳຄັນ
-  if (data.pass)    params.set('pass', data.pass);
-  if (data.sku)     params.set('sku', data.sku);
-  if (data.delta !== undefined) params.set('delta', data.delta);
-  if (data.invNo)   params.set('invNo', data.invNo);
-  if (data.lotId)   params.set('lotId', data.lotId);
-  // ສົ່ງ data ທີ່ເຫຼືອ JSON
-  const extra = Object.keys(data).filter(k=>!['pass','sku','delta','invNo','lotId'].includes(k));
-  if (extra.length > 0) {
-    const obj = {};
-    extra.forEach(k => obj[k] = data[k]);
-    params.set('d', JSON.stringify(obj));
-  }
-  const url = SCRIPT_URL + '?' + params.toString();
-  const res = await fetch(url, {method:'GET', redirect:'follow'});
-  return res.json();
-}
-
+// API — fetch POST
+// ມີ timeout 25 ວິ + ລອງໃໝ່ 1 ເທື່ອ — ກັນໜ້າຄ້າງເມື່ອ Apps Script ບໍ່ຕອບ
+let apiFailed=false;
 async function callAPI(payload){
-  try{
-    const d=await api(payload);
-    document.getElementById('connDot').className='conn-dot ok';
-    return d;
-  }catch(e){
-    document.getElementById('connDot').className='conn-dot err';
-    return offlineHandler(payload);
+  for(let i=0;i<2;i++){
+    try{
+      const ctl=new AbortController();const t=setTimeout(()=>ctl.abort(),25000);
+      const res=await fetch(SCRIPT_URL,{
+        method:'POST',
+        body:JSON.stringify(payload),
+        redirect:'follow',
+        headers:{'Content-Type':'text/plain'},
+        signal:ctl.signal
+      });
+      clearTimeout(t);
+      const d=await res.json();
+      document.getElementById('connDot').className='conn-dot ok';
+      return d;
+    }catch(e){ if(i===0) await new Promise(z=>setTimeout(z,1500)); }
   }
+  apiFailed=true;
+  document.getElementById('connDot').className='conn-dot err';
+  return offlineHandler(payload);
 }
 
 function offlineHandler(p){
@@ -568,21 +681,48 @@ function genSKU(cat){
 }
 
 async function loadData(){
+  apiFailed=false;
+  const sg=document.getElementById('statsGrid');
+  if(sg)sg.innerHTML='<div style="grid-column:1/-1;padding:24px;text-align:center;opacity:.7">⏳ ກຳລັງໂຫຼດຂໍ້ມູນ... (ອາດໃຊ້ເວລາ 10–30 ວິນາທີ)</div>';
   const [rP,rL,rS,rSt,rC]=await Promise.all([
     callAPI({action:'getProducts'}),callAPI({action:'getLots'}),
     callAPI({action:'getSales'}),callAPI({action:'getStock'}),callAPI({action:'getCost'})
   ]);
   products=rP.data||[];lots=rL.data||[];sales=rS.data||[];
   const sd=rSt.data||{};
-  if(Array.isArray(sd)){stockMap={};sd.forEach(r=>{stockMap[r['SKU']||r.sku]={qty:Number(r['ສະຕ໋ອກປັດຈຸບັນ']||r.qty||0),minQty:Number(r['ສະຕ໋ອກຂັ້ນຕ່ຳ']||r.minQty||3)};});}
+  if(Array.isArray(sd)){stockMap={};sd.forEach(r=>{stockMap[r['SKU']||r.sku]={qty:Number(r['ສະຕ໋ອກປັດຈຸບັນ']||r.qty||r.total||0),minQty:Number(r['ສະຕ໋ອກຂັ້ນຕ່ຳ']||r.minQty||3)};});}
   else stockMap=sd;
   const cd=rC.data||{};
   if(Array.isArray(cd)){costMap={};cd.forEach(r=>{costMap[r['SKU']||r.sku]={costItem:Number(r['ລາຄາຊື້/ຊີ້ນ']||r.costItem||0),costShip:Number(r['ຄ່າສົ່ງ/ຊີ້ນ']||r.costShip||0),costOther:Number(r['ຄ່າອື່ນ/ຊີ້ນ']||r.costOther||0)};});}
   else costMap=cd;
+  syncStockFromLots();
   renderAll();
+  showLoadWarning();
 }
 
-function renderAll(){renderStats();renderProdList();renderLotList();renderSales();prvSKU();}
+// ສະຕ໋ອກສຳຮອງ: ຄິດຈາກຈຳນວນ "ຄ້າງ" ໃນ Lot — ໃຊ້ເມື່ອ getStock ໄດ້ 0 ຫຼື ບໍ່ມີ
+function syncStockFromLots(){
+  const left={};
+  lots.forEach(l=>{const k=l['SKU']||l.sku;if(!k)return;
+    const q=(l['ຄ້າງ']!==undefined&&l['ຄ້າງ']!=='')?+l['ຄ້າງ']:(+l.left||0);
+    left[k]=(left[k]||0)+(q||0);});
+  Object.entries(left).forEach(([k,q])=>{
+    const cur=stockMap[k]||{qty:0,minQty:3};
+    if(q>Number(cur.qty||0))stockMap[k]={...cur,qty:q};
+  });
+  products.forEach(p=>{const k=p.sku||p['SKU'];if(k&&!stockMap[k])stockMap[k]={qty:0,minQty:3};});
+}
+
+function showLoadWarning(){
+  let w=document.getElementById('loadWarn');
+  if(!apiFailed){if(w)w.remove();return;}
+  if(!w){w=document.createElement('div');w.id='loadWarn';
+    w.style.cssText='position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:9999;background:#8b2e1f;color:#fff;padding:10px 16px;border-radius:6px;font-size:14px;box-shadow:0 4px 12px rgba(0,0,0,.25)';
+    document.body.appendChild(w);}
+  w.innerHTML='⚠️ ໂຫຼດຂໍ້ມູນຈາກ server ບໍ່ຄົບ — ຂໍ້ມູນທີ່ເຫັນອາດບໍ່ແມ່ນລ່າສຸດ <button onclick="loadData()" style="margin-left:10px;padding:4px 10px;border:0;border-radius:4px;cursor:pointer">🔄 ໂຫຼດໃໝ່</button>';
+}
+
+function renderAll(){renderStats();renderProdList();renderLotList();renderSales();prvSKU();populateLotSkuSelect();}
 
 // STATS
 function renderStats(){
@@ -590,7 +730,7 @@ function renderStats(){
   const ok=Object.values(stockMap).filter(s=>Number(s.qty||0)>3).length;
   const low=Object.values(stockMap).filter(s=>Number(s.qty||0)>0&&Number(s.qty||0)<=3).length;
   const out=Object.values(stockMap).filter(s=>Number(s.qty||0)===0).length;
-  const rev=sales.reduce((s,x)=>s+Number(x.net||x['ຍອດສຸດທິ']||0),0);
+  const rev=sales.reduce((s,x)=>s+Number(x['ຍອດສຸດທິ']||x['ສຸດທິ']||x.net||0),0);
   document.getElementById('statsGrid').innerHTML=`
     <div class="stat-card"><div class="stat-num">${total}</div><div class="stat-label">ສິນຄ້າ</div></div>
     <div class="stat-card warn"><div class="stat-num">${low}</div><div class="stat-label">ໃກ້ໝົດ</div></div>
@@ -604,11 +744,10 @@ function renderProdList(){
   if(!products.length){el.innerHTML='<div style="padding:30px;text-align:center;color:var(--brown);font-size:13px">ຍັງບໍ່ມີສິນຄ້າ</div>';return;}
   el.innerHTML=products.map(p=>{
     const sku=p.sku||p['SKU']||'';
-    const nameTh=p.nameTh||p['ຊື່ສິນຄ້າ (ລາວ)']||'';
-    const nameEn=p.nameEn||p['ຊື່ສິນຄ້າ (EN)']||'';
-    const cat=p.cat||p['ໝວດໝູ່']||'';
-    const price=+p.price||+p['ລາຄາຂາຍ']||0;
-    const imgUrl=toDrive(p.imgUrl||p['URL ຮູບພາບ']||'');
+    const nameTh=getName(p);
+    const cat=p.cat||p['ໝວດ']||p['ໝວດໝູ່']||'';
+    const price=+p.price||+p['ລາຄາຂາຍ']||+p['ລາຄາ']||0;
+    const imgUrl=toDrive(p.imgUrl||p['URL ຮູບ']||p['URL ຮູບພາບ']||'');
     const isPreorder=(p.preorder||p['preorder'])==='true'||p.preorder===true;
     const salePrice=+p.salePrice||+p['ລາຄາຫຼຸດ']||0;
     const st=stockMap[sku]||{qty:0,minQty:3};
@@ -639,6 +778,7 @@ function renderProdList(){
           <div class="s-num">${qty}</div>
           <button class="s-btn" onclick="chStock('${sku}',1)">+</button>
         </div>
+        <button class="btn-sm-del" onclick="openEditModal('${sku}')" style="color:var(--gold2)">✏️</button>
         <button class="btn-sm-del" onclick="delProduct('${sku}')">🗑</button>
       </div>
     </div>`;
@@ -649,15 +789,23 @@ function renderProdList(){
 function prvSKU(){
   const cat=document.getElementById('pCat').value;
   const pfx=SKU_PFX[cat]||'XX';
-  const cnt=products.filter(p=>(p.cat||p['ໝວດໝູ່'])===cat).length+1;
+  const cnt=products.filter(p=>(p.cat||p['ໝວດ']||p['ໝວດໝູ່'])===cat).length+1;
   document.getElementById('skuPrv').textContent=pfx+'-'+String(cnt).padStart(3,'0');
 }
-function prvImg(){
-  const url=document.getElementById('pImg').value.trim();
-  const img=document.getElementById('imgPrv');
-  if(!url){img.style.display='none';return;}
-  img.src=toDrive(url);img.style.display='block';
-  img.onerror=()=>img.style.display='none';
+function prvImg(){prvImgs();}
+function prvImgs(){
+  const strip=document.getElementById('imgPrvStrip');
+  if(!strip)return;
+  strip.innerHTML='';
+  ['pImg','pImg2','pImg3','pImg4'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el||!el.value.trim())return;
+    const img=document.createElement('img');
+    img.src=toDrive(el.value.trim());
+    img.style.cssText='width:70px;height:70px;object-fit:cover;border:1px solid var(--sand);border-radius:4px';
+    img.onerror=()=>img.remove();
+    strip.appendChild(img);
+  });
 }
 function calcCPv(){
   const sell=+document.getElementById('pPrice').value||0;
@@ -672,28 +820,61 @@ function calcCPv(){
   document.getElementById('cpP').className='cb-val '+(profit>=0?'g':'r');
   document.getElementById('cpPct').textContent=pct!=='—'?pct+'%':'—';
 }
+
+// ✅ ແກ້ addProduct: ຖ້າໃສ່ stock > 0 → ສ້າງ Lot ອັດຕະໂນມັດ
 async function addProduct(){
   const nameTh=document.getElementById('pTh').value.trim();
   const price=+document.getElementById('pPrice').value;
   if(!nameTh||!price){toast('⚠️ ກະລຸນາປ້ອນຊື່ ແລະ ລາຄາ');return;}
+  const stock=+document.getElementById('pStock').value||0;
+  const ci=+document.getElementById('pCI').value||0;
+  const cs=+document.getElementById('pCS').value||0;
+  const co=+document.getElementById('pCO').value||0;
+  const unitCost=ci+cs+co;
+
+  // ເພີ່ມສິນຄ້າກ່ອນ
   const res=await callAPI({action:'addProduct',data:{
     nameTh,nameEn:document.getElementById('pEn').value.trim(),
-    cat:document.getElementById('pCat').value,price,stock:+document.getElementById('pStock').value||0,
+    cat:document.getElementById('pCat').value,price,stock,
     salePrice:+document.getElementById('pSalePrice').value||0,
     preorder:document.getElementById('pPreorder').value,
     imgUrl:toDrive(document.getElementById('pImg').value.trim()),
-    costItem:+document.getElementById('pCI').value||0,
-    costShip:+document.getElementById('pCS').value||0,
-    costOther:+document.getElementById('pCO').value||0
+    imgUrl2:toDrive((document.getElementById('pImg2')||{value:''}).value.trim()),
+    imgUrl3:toDrive((document.getElementById('pImg3')||{value:''}).value.trim()),
+    imgUrl4:toDrive((document.getElementById('pImg4')||{value:''}).value.trim()),
+    costItem:ci,costShip:cs,costOther:co
   }});
-  if(res.status==='ok'){toast(`✓ ເພີ່ມ "${nameTh}" SKU: ${res.sku}`);clrProduct();await loadData();}
-  else toast('❌ '+res.message);
+
+  if(res.status==='ok'){
+    const sku=res.sku;
+    toast(`✓ ເພີ່ມ "${nameTh}" SKU: ${sku}`);
+
+    // ✅ ຖ້າມີ stock > 0 ແລະ ມີຕົ້ນທຶນ → ສ້າງ Lot ອັດຕະໂນມັດ
+    if(stock>0){
+      const lotRes=await callAPI({action:'addLot',data:{
+        sku: sku,
+        name: nameTh + ' (ສະຕ໋ອກເດີມ)',
+        qty: stock,
+        buyTotal: ci * stock,
+        shipTotal: cs * stock,
+        otherTotal: co * stock,
+        date: today()
+      }});
+      if(lotRes.status==='ok'){
+        toast(`✓ ສ້າງ Lot ສະຕ໋ອກເດີມ ${stock} ຊີ້ນ @ ₭${fmt(unitCost)}/ຊີ້ນ ອັດຕະໂນມັດ`);
+      }
+    }
+
+    clrProduct();await loadData();
+  } else toast('❌ '+res.message);
 }
+
 function clrProduct(){
-  ['pTh','pEn','pPrice','pSalePrice','pStock','pImg','pCI','pCS','pCO'].forEach(i=>{const el=document.getElementById(i);if(el)el.value='';});
+  ['pTh','pEn','pPrice','pSalePrice','pStock','pImg','pImg2','pImg3','pImg4','pCI','pCS','pCO'].forEach(i=>{const el=document.getElementById(i);if(el)el.value='';});
+  const strip=document.getElementById('imgPrvStrip');if(strip)strip.innerHTML='';;
   document.getElementById('pCat').value='ເຟີນີເຈີ';
   document.getElementById('pPreorder').value='false';
-  document.getElementById('imgPrv').style.display='none';
+  const imgPrv=document.getElementById('imgPrv');if(imgPrv)imgPrv.style.display='none';
   calcCPv();prvSKU();
 }
 async function delProduct(sku){
@@ -704,41 +885,68 @@ async function delProduct(sku){
 async function chStock(sku,delta){
   await callAPI({action:'updateStock',data:{sku,delta}});
   const p=products.find(x=>(x.sku||x['SKU'])===sku);
-  toast(`${delta>0?'+':''}${delta} ສະຕ໋ອກ "${p?p.nameTh||p['ຊື່ສິນຄ້າ (ລາວ)']:sku}"`);
+  toast(`${delta>0?'+':''}${delta} ສະຕ໋ອກ "${p?getName(p)||sku:sku}"`);
   await loadData();
 }
 
 // LOT
-function calcLot(){
-  const qty=+document.getElementById('lQ').value||0;
-  const buy=+document.getElementById('lB').value||0;
-  const ship=+document.getElementById('lS').value||0;
-  const fee=+document.getElementById('lF').value||0;
-  document.getElementById('lBP').textContent=qty>0?`₭${(buy/qty).toFixed(2)}`:'₭ —';
-  document.getElementById('lSP').textContent=qty>0?`₭${((ship+fee)/qty).toFixed(2)}`:'₭ —';
-  document.getElementById('lTP').textContent=qty>0?`₭${((buy+ship+fee)/qty).toFixed(2)}`:'₭ —';
+function populateLotSkuSelect(){
+  const sel=document.getElementById('lSku');if(!sel)return;
+  sel.innerHTML='<option value="">— ເລືອກສິນຄ້າ —</option>'+
+    products.map(p=>{
+      const sku=p.sku||p['SKU']||'';
+      const name=getName(p)||sku;
+      const st=stockMap[sku]||{qty:0};
+      return`<option value="${sku}">${name} · ຄ້າງ ${st.qty||0} ຊີ້ນ</option>`;
+    }).join('');
 }
+
+function calcLot(){
+  const ci=+document.getElementById('lCostItem')?.value||0;
+  const cs=+document.getElementById('lCostShip')?.value||0;
+  const co=+document.getElementById('lCostOther')?.value||0;
+  const total=ci+cs+co;
+  document.getElementById('lBP').textContent=ci>0?`₭${fmt(ci)}`:'₭ —';
+  document.getElementById('lSP').textContent=(cs+co)>0?`₭${fmt(cs+co)}`:'₭ —';
+  document.getElementById('lTP').textContent=total>0?`₭${fmt(total)}`:'₭ —';
+}
+
 async function addLot(){
+  const sku=document.getElementById('lSku').value;
   const qty=+document.getElementById('lQ').value||0;
-  if(!qty){toast('⚠️ ໃສ່ຈຳນວນຊີ້ນດ້ວຍ');return;}
-  const buy=+document.getElementById('lB').value||0;
-  const ship=+document.getElementById('lS').value||0;
-  const fee=+document.getElementById('lF').value||0;
+  const ci=+(document.getElementById('lCostItem')||{value:0}).value||0;
+  const cs=+(document.getElementById('lCostShip')||{value:0}).value||0;
+  const co=+(document.getElementById('lCostOther')||{value:0}).value||0;
+  const cost=ci+cs+co;
+  if(!sku){toast('⚠️ ເລືອກສິນຄ້າດ້ວຍ');return;}
+  if(!qty){toast('⚠️ ໃສ່ຈຳນວນດ້ວຍ');return;}
+  if(!ci){toast('⚠️ ໃສ່ລາຄາຊື້/ຊີ້ນດ້ວຍ');return;}
   const res=await callAPI({action:'addLot',data:{
-    name:document.getElementById('lN').value.trim()||'ລ໋ອດໃໝ່',
-    qty,buyTotal:buy,shipTotal:ship,otherTotal:fee,
+    sku,qty,cost,
     date:document.getElementById('lD').value||today()
   }});
-  if(res.status==='ok'){toast(`✓ ບັນທຶກລ໋ອດ ຕົ້ນທຶນ/ຊີ້ນ ₭${Number(res.perItem).toFixed(2)}`);clrLot();await loadData();}
+  if(res.status==='ok'){
+    toast(`✓ ເພີ່ມ Lot ${qty} ຊີ້ນ @ ₭${fmt(cost)}/ຊີ້ນ`);
+    ['lQ','lCostItem','lCostShip','lCostOther'].forEach(i=>{const el=document.getElementById(i);if(el)el.value='';});
+    const ls=document.getElementById('lSku');if(ls)ls.value='';
+    const ld=document.getElementById('lD');if(ld)ld.value=today();
+    calcLot();await loadData();
+  } else toast('❌ '+(res.message||'error'));
 }
+
 function useLot(buyPer,shipPer){
   document.getElementById('pCI').value=Number(buyPer).toFixed(2);
   document.getElementById('pCS').value=Number(shipPer).toFixed(2);
   goTab('tabAdd',document.querySelectorAll('.at')[1]);
   calcCPv();
-  toast(`✓ ນຳຕົ້ນທຶນ ₭${buyPer} + ຄ່າສົ່ງ ₭${shipPer}/ຊີ້ນ ໄປໃສ່ຟອມແລ້ວ`);
 }
-function clrLot(){['lN','lQ','lB','lS','lF'].forEach(i=>{const el=document.getElementById(i);if(el)el.value='';});document.getElementById('lD').value=today();calcLot();}
+function clrLot(){
+  ['lQ','lCostItem','lCostShip','lCostOther'].forEach(i=>{const el=document.getElementById(i);if(el)el.value='';});
+  const ld=document.getElementById('lD');if(ld)ld.value=today();
+  const ls=document.getElementById('lSku');if(ls)ls.value='';
+  calcLot();
+}
+
 async function delLot(id){
   if(!confirm('ລົບລ໋ອດນີ້?'))return;
   await callAPI({action:'deleteLot',data:{lotId:id}});
@@ -746,102 +954,216 @@ async function delLot(id){
 }
 function renderLotList(){
   const el=document.getElementById('lotList');
-  if(!lots.length){el.innerHTML='<div style="padding:20px;text-align:center;color:var(--brown);font-size:13px">ຍັງບໍ່ມີລ໋ອດ</div>';return;}
-  el.innerHTML=[...lots].reverse().map(l=>{
-    const id=l.lotId||l['LotID'];
-    const name=l.name||l['ຊື່ລ໋ອດ']||'';
-    const qty=l.qty||l['ຈຳນວນຊີ້ນ']||0;
-    const buy=+l.buyTotal||+l['ລາຄາຊື້ລວມ']||0;
-    const ship=+l.shipTotal||+l['ຄ່າສົ່ງລວມ']||0;
-    const fee=+l.otherTotal||+l['ຄ່າອື່ນໆ']||0;
-    const buyPer=qty>0?(buy/qty):0;
-    const shipPer=qty>0?((ship+fee)/qty):0;
-    return`<div class="lot-card">
-      <div class="lot-head">
-        <div><div class="lot-name">${name}</div><div class="lot-date">${l.date||l['ວັນທີ່ຮັບ']||''} · ${qty} ຊີ້ນ</div></div>
+  if(!lots.length){el.innerHTML='<div style="padding:20px;text-align:center;color:var(--brown);font-size:13px">ຍັງບໍ່ມີ Lot</div>';return;}
+
+  // ຈັດກຸ່ມຕາມ SKU
+  const skuGroups={};
+  lots.forEach(l=>{
+    const sku=l['SKU']||l.sku||'';
+    if(!skuGroups[sku]) skuGroups[sku]=[];
+    skuGroups[sku].push(l);
+  });
+
+  el.innerHTML=Object.entries(skuGroups).map(([sku,skuLots])=>{
+    const p=products.find(x=>(x.sku||x['SKU'])===sku);
+    const name=p?(getName(p)||sku):sku;
+    const totalLeft=skuLots.reduce((s,l)=>s+(+l['ຄ້າງ']||+l.left||0),0);
+    const totalOrig=skuLots.reduce((s,l)=>s+(+l['ຈຳນວນເດີມ']||+l.qty||0),0);
+
+    const lotRows=skuLots.map((l,i)=>{
+      const id=l['LotID']||l.lotId||'';
+      const cost=+l['ຕົ້ນທຶນ']||+l.cost||+l.costItem||0;
+      const ship=+l.costShip||0;
+      const other=+l.costOther||0;
+      const totalPerUnit=cost+ship+other;
+      const orig=+l['ຈຳນວນເດີມ']||+l.qty||0;
+      const left=+l['ຄ້າງ']||+l.left||0;
+      const date=(l['ວັນທີຊື້']||l.date||'').slice(0,10);
+      const totalCost=cost*orig;
+      return`<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--sand)">
+        <div>
+          <div style="font-size:10px;color:var(--gold2);letter-spacing:1px;margin-bottom:2px">Lot ${i+1} · ${date}</div>
+          <div style="font-size:12px;color:var(--espresso)">ຊື້ <strong>₭${fmt(cost)}</strong> + ສົ່ງ ₭${fmt(ship+other)} = <strong>₭${fmt(totalPerUnit)}</strong>/ຊີ້ນ · ຈຳນວນ ${orig} · ຄ້າງ <span style="color:${left<=0?'var(--danger)':'var(--ok)'};font-weight:600">${left}</span></div>
+          <div style="font-size:10px;color:var(--brown)">ຕົ້ນທຶນລວມ Lot ₭${fmt(totalPerUnit*orig)}</div>
+        </div>
         <button class="btn-sm-del" onclick="delLot('${id}')">🗑</button>
+      </div>`;
+    }).join('');
+
+    return`<div class="lot-card" style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+        <div>
+          <div class="lot-name">${name}</div>
+          <div class="lot-date">${sku} · ${skuLots.length} Lot · ຄ້າງລວມ <strong>${totalLeft}</strong>/${totalOrig} ຊີ້ນ</div>
+        </div>
       </div>
-      <div class="lot-stats">
-        <div><div class="lot-stat-label">ລາຄາຊື້/ຊີ້ນ</div><div class="lot-stat-val">₭${buyPer.toFixed(2)}</div></div>
-        <div><div class="lot-stat-label">ຄ່າສົ່ງ+ອື່ນ/ຊີ້ນ</div><div class="lot-stat-val" style="color:var(--gold2)">₭${shipPer.toFixed(2)}</div></div>
-        <div><div class="lot-stat-label">ຕົ້ນທຶນລວມ/ຊີ້ນ</div><div class="lot-stat-val">₭${(buyPer+shipPer).toFixed(2)}</div></div>
-      </div>
-      <button class="btn-g" onclick="useLot(${buyPer.toFixed(2)},${shipPer.toFixed(2)})" style="margin-bottom:0;font-size:10px;padding:10px">ນຳໄປໃຊ້ →</button>
+      ${lotRows}
     </div>`;
   }).join('');
 }
 
-// SALE
+// SALE — Cart System
+let cart = [];
+
 function populateSaleSelect(){
   const sel=document.getElementById('sProd');if(!sel)return;
-  const cur=sel.value;
-  sel.innerHTML='<option value="">— ເລືອກສິນຄ້າ —</option>'+
+  sel.innerHTML='<option value="">— ເລືອກ —</option>'+
     products.map(p=>{
-      const sku=p.sku||p['SKU'];
-      const name=p.nameTh||p['ຊື່ສິນຄ້າ (ລາວ)']||'';
+      const sku=p.sku||p['SKU']||'';
+      const name=getName(p);
       const st=stockMap[sku]||{qty:0};
-      return`<option value="${sku}" ${sku===cur?'selected':''}>${sku} — ${name} (${st.qty||0} ຊີ້ນ)</option>`;
+      const pr=getPrices(p);
+      const tag=pr.unitDisc>0?` 🏷️ ຫຼຸດ ₭${fmt(pr.sale)}`:'';
+      return`<option value="${sku}">${sku} — ${name} (${st.qty||0} ຊີ້ນ)${tag}</option>`;
     }).join('');
-  calcSPv();
 }
-function getSaleProd(){const sku=document.getElementById('sProd').value;return products.find(p=>(p.sku||p['SKU'])===sku)||null;}
-function calcSPv(){
-  const p=getSaleProd();
+
+function onProdSelect(){
+  const sku=document.getElementById('sProd').value;
+  const p=products.find(x=>(x.sku||x['SKU'])===sku);
+  const sP=document.getElementById('sP');
+  if(!p){sP.value='';sP.dataset.unitDisc=0;document.getElementById('sD').value='0';return;}
+  const pr=getPrices(p);
+  sP.value=pr.price||'';
+  sP.dataset.unitDisc=pr.unitDisc;
+  updateAutoDisc();
+}
+
+// ຊື່ສິນຄ້າ — ອ່ານທຸກຊື່ຖັນທີ່ອາດໃຊ້ໃນ Sheet
+function getName(p){
+  if(!p)return'';
+  return String(p.nameTh||p['ຊື່ສິນຄ້າ']||p['ຊື່ສິນຄ້າ (ລາວ)']||p['ຊື່']||p.name||p.nameEn||'').trim();
+}
+
+// ລາຄາຂອງສິນຄ້າ: ລາຄາເດີມ, ລາຄາຫຼຸດ, ສ່ວນຫຼຸດຕໍ່ຊີ້ນ
+function getPrices(p){
+  const price=+p.price||+p['ລາຄາຂາຍ']||+p['ລາຄາ']||0;
+  const sale=+p.salePrice||+p['ລາຄາຫຼຸດ']||0;
+  const unitDisc=(sale>0&&sale<price)?(price-sale):0;
+  return{price,sale,unitDisc};
+}
+
+function updateAutoDisc(){
+  const ud=+document.getElementById('sP').dataset.unitDisc||0;
+  const qty=+document.getElementById('sQ').value||1;
+  document.getElementById('sD').value=ud*qty;
+}
+
+function addToCart(){
+  const sku=document.getElementById('sProd').value;
+  if(!sku){toast('⚠️ ເລືອກສິນຄ້າກ່ອນ');return;}
+  const p=products.find(x=>(x.sku||x['SKU'])===sku);
+  if(!p){return;}
   const qty=+document.getElementById('sQ').value||1;
   const cp=+document.getElementById('sP').value||0;
-  const disc=+document.getElementById('sD').value||0;
-  if(!p){['spR','spD','spP','spS'].forEach(i=>document.getElementById(i).textContent='—');return;}
-  const price=cp||(+p.price||+p['ລາຄາຂາຍ']||0);
-  const net=(price*qty)-disc;
-  const c=costMap[p.sku||p['SKU']]||{};
-  const unitCost=(+c.costItem||0)+(+c.costShip||0)+(+c.costOther||0);
-  const profit=net-(unitCost*qty);
-  const st=stockMap[p.sku||p['SKU']]||{qty:0};
-  const after=(Number(st.qty)||0)-qty;
-  document.getElementById('spR').textContent=`₭${fmt(net)}`;
-  document.getElementById('spD').textContent=`₭${fmt(disc)}`;
-  document.getElementById('spP').textContent=unitCost>0?`₭${fmt(profit)}`:'—';
-  document.getElementById('spP').className='sp-val '+(profit>=0?'g':'r');
-  document.getElementById('spS').textContent=`${after} ຊີ້ນ`;
-  document.getElementById('spS').className='sp-val '+(after<0?'r':after<=3?'':'g');
-}
-async function addSale(doPrint=false){
-  const p=getSaleProd();
-  if(!p){toast('⚠️ ກະລຸນາເລືອກສິນຄ້າ');return;}
-  const sku=p.sku||p['SKU'];
-  const qty=+document.getElementById('sQ').value||1;
+  const pr=getPrices(p);
+  const price=cp||pr.price;
+  let disc=+document.getElementById('sD').value||0;
+  // ຖ້າຊ່ອງລາຄາວ່າງ (ໃຊ້ລາຄາເດີມ) ແລະ ບໍ່ໄດ້ໃສ່ສ່ວນຫຼຸດ → ໃຊ້ລາຄາຫຼຸດອັດຕະໂນມັດ
+  if(!cp&&!disc&&pr.unitDisc>0)disc=pr.unitDisc*qty;
   const st=stockMap[sku]||{qty:0};
-  if(qty>Number(st.qty||0)){toast(`⚠️ ສະຕ໋ອກເຫຼືອ ${st.qty||0} ຊີ້ນ`);return;}
-  const cp=+document.getElementById('sP').value||0;
-  const price=cp||(+p.price||+p['ລາຄາຂາຍ']||0);
-  const disc=+document.getElementById('sD').value||0;
-  const c=costMap[sku]||{};
-  const unitCost=(+c.costItem||0)+(+c.costShip||0)+(+c.costOther||0);
+
+  // ກວດສະຕ໋ອກ
+  const inCart=cart.filter(c=>c.sku===sku).reduce((s,c)=>s+c.qty,0);
+  if(qty+inCart>Number(st.qty||0)){
+    // ບໍ່ບລັອກ — ໃຫ້ຢືນຢັນ ແລ້ວຂາຍຕໍ່ໄດ້ (ກໍລະນີສະຕ໋ອກໃນລະບົບບໍ່ຖືກ)
+    if(!confirm(`ລະບົບສະແດງສະຕ໋ອກ ${st.qty||0} ຊີ້ນ (ໃນກະຕ່າ ${inCart} ແລ້ວ).\nຂາຍຕໍ່ຢູ່ບໍ່?`))return;
+  }
+
+  // ຖ້າ SKU ນີ້ຢູ່ໃນກະຕ່າແລ້ວ ໃຫ້ update
+  const existing=cart.find(c=>c.sku===sku&&c.price===price&&c.disc===disc);
+  if(existing){
+    existing.qty+=qty;
+  } else {
+    cart.push({
+      sku,
+      productName:getName(p),
+      qty,price,disc,
+      net:(price*qty)-disc
+    });
+  }
+
+  // reset fields
+  document.getElementById('sProd').value='';
+  document.getElementById('sQ').value='1';
+  document.getElementById('sP').value='';
+  document.getElementById('sP').dataset.unitDisc=0;
+  document.getElementById('sD').value='0';
+  renderCart();
+}
+
+function removeFromCart(i){
+  cart.splice(i,1);
+  renderCart();
+}
+
+function renderCart(){
+  const el=document.getElementById('cartList');
+  if(!cart.length){
+    el.innerHTML='<div style="padding:20px;text-align:center;color:var(--brown);font-size:13px;border:1px dashed var(--sand)">ຍັງບໍ່ມີສິນຄ້າໃນກະຕ່າ</div>';
+    document.getElementById('cartSummary').style.display='none';
+    document.getElementById('btnCheckout').style.display='none';
+    document.getElementById('btnCheckoutPrint').style.display='none';
+    return;
+  }
+  let totalGross=0,totalDisc=0,totalNet=0;
+  el.innerHTML=cart.map((c,i)=>{
+    const gross=c.price*c.qty;
+    const net=gross-c.disc;
+    totalGross+=gross;totalDisc+=c.disc;totalNet+=net;
+    return`<div class="cart-item">
+      <div class="cart-item-info">
+        <div class="cart-item-name">${c.sku} — ${c.productName}</div>
+        <div class="cart-item-sub">${c.qty} ຊີ້ນ × ₭${fmt(c.price)}${c.disc>0?' (ຫຼຸດ ₭'+fmt(c.disc)+')':''}</div>
+      </div>
+      <div class="cart-item-price">₭${fmt(net)}</div>
+      <button class="btn-sm-del" onclick="removeFromCart(${i})">🗑</button>
+    </div>`;
+  }).join('');
+  document.getElementById('cartTotal').textContent='₭'+fmt(totalGross);
+  document.getElementById('cartDisc').textContent='₭'+fmt(totalDisc);
+  document.getElementById('cartNet').textContent='₭'+fmt(totalNet);
+  document.getElementById('cartCount').textContent=cart.length+' ລາຍການ';
+  document.getElementById('cartSummary').style.display='grid';
+  document.getElementById('btnCheckout').style.display='block';
+  document.getElementById('btnCheckoutPrint').style.display='block';
+}
+
+async function checkout(doPrint=false){
+  if(!cart.length){toast('⚠️ ກະຕ່າຫວ່າງ');return;}
   const data={
-    sku,productName:p.nameTh||p['ຊື່ສິນຄ້າ (ລາວ)']||'',
-    qty,unitPrice:price,discount:disc,unitCost,
-    channel:document.getElementById('sCh').value,
-    date:document.getElementById('sDate').value||today(),
+    items: cart.map(c=>({sku:c.sku,productName:c.productName,qty:c.qty,price:c.price,disc:c.disc})),
     customerName:document.getElementById('sCN').value.trim(),
     customerPhone:document.getElementById('sCP').value.trim(),
     customerAddress:document.getElementById('sCA').value.trim(),
+    date:document.getElementById('sDate').value||today(),
+    channel:document.getElementById('sCh').value,
     note:document.getElementById('sNote').value.trim()
   };
-  const res=await callAPI({action:'addSale',data});
+  const res=await callAPI({action:'addSaleCart',data});
   if(res.status==='ok'){
-    toast(`✓ ບັນທຶກ ${res.invNo}`);
-    if(doPrint)showInv({...data,...res});
-    clrSale();await loadData();
-  } else toast('❌ '+(res.message||'ເກີດຂໍ້ຜິດພາດ'));
-}
-function clrSale(){
-  ['sQ','sP','sD','sCN','sCP','sCA','sNote'].forEach(i=>{const el=document.getElementById(i);if(el)el.value=i==='sQ'?'1':'';});
-  document.getElementById('sProd').value='';
-  document.getElementById('sDate').value=today();
-  document.getElementById('sCh').value='direct';
-  calcSPv();
+    toast(`✓ ບັນທຶກ ${res.invNo} — ${cart.length} ລາຍການ`);
+    if(doPrint) showInvCart(res.invNo, data, cart);
+    clrSale();
+    await loadData();
+  } else toast('❌ '+(res.message||'error'));
 }
 
+function clrSale(){
+  cart=[];
+  renderCart();
+  ['sCN','sCP','sCA','sNote','sP','sD'].forEach(i=>{const el=document.getElementById(i);if(el)el.value='';});
+  document.getElementById('sProd').value='';
+  document.getElementById('sQ').value='1';
+  document.getElementById('sD').value='0';
+  document.getElementById('sDate').value=today();
+  document.getElementById('sCh').value='direct';
+}
+
+// compat: old single-item addSale still works
+async function addSale(doPrint=false){
+  await checkout(doPrint);
+}
 // SALES HISTORY
 function fSales(ch,el){
   salesFilter=ch;
@@ -849,9 +1171,9 @@ function fSales(ch,el){
   el.classList.add('active');renderSales();
 }
 function renderSales(){
-  const rev=sales.reduce((s,x)=>s+Number(x.net||x['ຍອດສຸດທິ']||0),0);
-  const profit=sales.reduce((s,x)=>s+Number(x.profit||x['ກຳໄລ']||0),0);
-  const qty=sales.reduce((s,x)=>s+Number(x.qty||x['ຈຳນວນ']||0),0);
+  const rev=sales.reduce((s,x)=>s+Number(x['ຍອດສຸດທິ']||x['ສຸດທິ']||x.net||0),0);
+  const profit=sales.reduce((s,x)=>s+Number(x['ກຳໄລ']||x.profit||0),0);
+  const qty=sales.reduce((s,x)=>s+Number(x['ຈຳນວນ']||x.qty||0),0);
   const ss=document.getElementById('salesSum');
   if(ss)ss.innerHTML=`
     <div class="stat-card"><div class="stat-num">${sales.length}</div><div class="stat-label">ລາຍການ</div></div>
@@ -861,23 +1183,35 @@ function renderSales(){
   const el=document.getElementById('salesList');if(!el)return;
   const list=salesFilter==='all'?sales:sales.filter(s=>(s.channel||s['ຊ່ອງທາງ'])===salesFilter);
   if(!list.length){el.innerHTML='<div style="padding:24px;text-align:center;color:var(--brown);font-size:13px">ຍັງບໍ່ມີລາຍການຂາຍ</div>';return;}
-  el.innerHTML=[...list].reverse().map(s=>{
-    const invNo=s.invNo||s['InvNo']||'—';
-    const pName=s.productName||s['ຊື່ສິນຄ້າ']||'';
-    const cust=s.customerName||s['ຊື່ລູກຄ້າ']||'ລູກຄ້າທົ່ວໄປ';
-    const net=s.net||s['ຍອດສຸດທິ']||0;
-    const profit=s.profit||s['ກຳໄລ']||0;
-    const ch=s.channel||s['ຊ່ອງທາງ']||'other';
-    const date=s.date||s['ວັນທີ່']||'';
+    // ໂຮມ rows ຕາມ InvNo
+  const grouped={};
+  [...list].reverse().forEach(row=>{
+    const inv=row['InvNo']||row.invNo||'—';
+    if(!grouped[inv]) grouped[inv]=[];
+    grouped[inv].push(row);
+  });
+  el.innerHTML=Object.entries(grouped).map(([invNo,rows])=>{
+    const first=rows[0];
+    const cust=first['ລູກຄ້າ']||first.customerName||'ລູກຄ້າທົ່ວໄປ';
+    const date=first['ວັນທີ']||first.date||'';
+    const ch=first['ຊ່ອງທາງ']||first.channel||'other';
+    const totalNet=rows.reduce((a,r)=>a+Number(r['ຍອດສຸດທິ']||r['ສຸດທິ']||r.net||0),0);
+    const totalProfit=rows.reduce((a,r)=>a+Number(r['ກຳໄລ']||r.profit||0),0);
+    const itemsHtml=rows.map(r=>{
+      const name=r['ສິນຄ້າ']||r['ຊື່ສິນຄ້າ']||r.productName||'';
+      const qty=r['qty']||r['ຈຳນວນ']||1;
+      const net=+r['ຍອດສຸດທິ']||+r['ສຸດທິ']||+r.net||0;
+      return`<div style="font-size:11px;color:var(--brown)">· ${name} × ${qty} = ₭${fmt(net)}</div>`;
+    }).join('');
     return`<div class="sale-card">
       <div class="sale-card-left">
         <div class="sale-inv">${invNo} · ${date}</div>
-        <div class="sale-prod">${pName} × ${s.qty||s['ຈຳນວນ']||1}</div>
-        <div class="sale-customer">👤 ${cust} <span class="${CH_CLS[ch]||'ch-x'}" style="margin-left:4px">${CH_LBL[ch]||ch}</span></div>
+        ${itemsHtml}
+        <div class="sale-customer" style="margin-top:4px">👤 ${cust} <span class="${CH_CLS[ch]||'ch-x'}" style="margin-left:4px">${CH_LBL[ch]||ch}</span></div>
       </div>
       <div class="sale-card-right">
-        <div class="sale-amount">₭${fmt(net)}</div>
-        <div class="sale-profit-tag ${Number(profit)>=0?'profit-p':'profit-n'}">ກຳໄລ ₭${fmt(profit)}</div>
+        <div class="sale-amount">₭${fmt(totalNet)}</div>
+        <div class="sale-profit-tag ${Number(totalProfit)>=0?'profit-p':'profit-n'}">ກຳໄລ ₭${fmt(totalProfit)}</div>
         <button style="background:var(--gold2);border:none;padding:5px 10px;font-size:10px;cursor:pointer;margin-top:4px;font-family:'Noto Sans Thai',sans-serif" onclick="showInvById('${invNo}')">🖨️ ໃບບິນ</button>
         <button class="btn-sm-del" onclick="delSale('${invNo}')">🗑</button>
       </div>
@@ -891,6 +1225,49 @@ async function delSale(invNo){
 }
 
 // INVOICE
+
+function showInvCart(invNo, d, cartItems){
+  const rows=cartItems.map((c,i)=>{
+    const gross=c.price*c.qty;
+    const net=gross-c.disc;
+    return`<tr>
+      <td>${i+1}</td><td>${c.productName||c.sku}</td>
+      <td style="text-align:center">${c.qty}</td>
+      <td>₭${fmt(c.price)}</td>
+      <td>${c.disc>0?'-₭'+fmt(c.disc):''}</td>
+      <td>₭${fmt(net)}</td>
+    </tr>`;
+  }).join('');
+  const grandNet=cartItems.reduce((s,c)=>s+(c.price*c.qty-c.disc),0);
+  const grandDisc=cartItems.reduce((s,c)=>s+c.disc,0);
+  const grandGross=cartItems.reduce((s,c)=>s+c.price*c.qty,0);
+  document.getElementById('invoicePrint').innerHTML=`
+    <div class="inv-hdr">
+      <div><div class="inv-brand">Sense of Home</div><div class="inv-brand-sub">ອະລັງການງານແຕ່ງບ້ານ</div></div>
+      <div class="inv-meta">ເລກທີ່: <strong>${invNo}</strong><br>ວັນທີ່: ${d.date||today()}<br>${CH_LBL[d.channel]||''}</div>
+    </div>
+    <div class="inv-parties">
+      <div><div class="inv-party-lbl">ຜູ້ຂາຍ</div><div class="inv-party-val"><strong>Sense of Home</strong><br>📞 020 5985 0932</div></div>
+      <div><div class="inv-party-lbl">ລູກຄ້າ</div><div class="inv-party-val">
+        <strong>${d.customerName||'ລູກຄ້າທົ່ວໄປ'}</strong><br>
+        ${d.customerPhone?'📞 '+d.customerPhone:''}
+        ${d.customerAddress?'<br>📍 '+d.customerAddress:''}
+      </div></div>
+    </div>
+    <table class="inv-tbl">
+      <thead><tr><th>#</th><th>ສິນຄ້າ</th><th>ຈຳນວນ</th><th>ລາຄາ/ຊີ້ນ</th><th>ສ່ວນຫຼຸດ</th><th>ລວມ</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div class="inv-totals">
+      <div class="inv-tr"><span>ຍອດລວມ</span><span>₭${fmt(grandGross)}</span></div>
+      ${grandDisc>0?`<div class="inv-tr"><span>ສ່ວນຫຼຸດລວມ</span><span>-₭${fmt(grandDisc)}</span></div>`:''}
+      <div class="inv-tr grand"><span>ຍອດສຸດທິ</span><span>₭${fmt(grandNet)}</span></div>
+    </div>
+    ${d.note?`<div style="margin-top:14px;font-size:11px;color:#777">ໝາຍເຫດ: ${d.note}</div>`:''}
+    <div class="inv-footer">ຂອບໃຈທີ່ສະໜັບສະໜູນ Sense of Home 🏠</div>`;
+  document.getElementById('invoiceModal').classList.add('show');
+}
+
 function showInv(d){
   const net=Number(d.net||0);const disc=Number(d.discount||0);const gross=net+disc;
   document.getElementById('invoicePrint').innerHTML=`
@@ -907,9 +1284,9 @@ function showInv(d){
       </div></div>
     </div>
     <table class="inv-tbl">
-      <thead><tr><th>#</th><th>SKU</th><th>ສິນຄ້າ</th><th>ຈຳນວນ</th><th>ລາຄາ/ຊີ້ນ</th><th>ລວມ</th></tr></thead>
+      <thead><tr><th>#</th><th>ສິນຄ້າ</th><th>ຈຳນວນ</th><th>ລາຄາ/ຊີ້ນ</th><th>ລວມ</th></tr></thead>
       <tbody><tr>
-        <td>1</td><td>${d.sku||'—'}</td><td>${d.productName||'—'}</td>
+        <td>1</td><td>${d.productName||d.sku||'—'}</td>
         <td style="text-align:center">${d.qty}</td>
         <td>₭${fmt(d.unitPrice)}</td>
         <td>₭${fmt(gross)}</td>
@@ -925,17 +1302,43 @@ function showInv(d){
   document.getElementById('invoiceModal').classList.add('show');
 }
 function showInvById(invNo){
-  const s=sales.find(x=>(x.invNo||x['InvNo'])===invNo);if(!s)return;
+  const rows=sales.filter(x=>(x['InvNo']||x.invNo)===invNo);
+  if(!rows.length)return;
+  const first=rows[0];
+  if(rows.length>1){
+    const cartItems=rows.map(r=>({
+      sku:r['SKU']||r.sku||'',
+      productName:r['ສິນຄ້າ']||r['ຊື່ສິນຄ້າ']||r['ຊື່ສິນຄ້າ (ລາວ)']||r.productName||'',
+      qty:+r['qty']||+r['ຈຳນວນ']||1,
+      price:+r['ລາຄາ']||+r['ລາຄາ/ຊີ້ນ']||+r.price||+r.unitPrice||0,
+      disc:+r['ສ່ວນຫຼຸດ']||+r.disc||+r.discount||0
+    }));
+    showInvCart(invNo,{
+      customerName:first['ລູກຄ້າ']||first.customerName||'',
+      customerPhone:first['ໂທ']||first.customerPhone||'',
+      customerAddress:first['ທີ່ຢູ່']||first.customerAddress||'',
+      date:first['ວັນທີ']||first.date||'',
+      channel:first['ຊ່ອງທາງ']||first.channel||'direct',
+      note:first['ໝາຍເຫດ']||first.note||''
+    },cartItems);
+    return;
+  }
+  // Single item — use first directly
+  const sinv=first;
   showInv({
-    invNo:s.invNo||s['InvNo'],date:s.date||s['ວັນທີ່'],
-    sku:s.sku||s['SKU'],productName:s.productName||s['ຊື່ສິນຄ້າ'],
-    qty:s.qty||s['ຈຳນວນ']||1,unitPrice:s.unitPrice||s['ລາຄາ/ຊີ້ນ']||0,
-    discount:s.discount||s['ສ່ວນຫຼຸດ']||0,net:s.net||s['ຍອດສຸດທິ']||0,
-    channel:s.channel||s['ຊ່ອງທາງ'],
-    customerName:s.customerName||s['ຊື່ລູກຄ້າ']||'',
-    customerPhone:s.customerPhone||s['ເບີໂທລະສັບ']||'',
-    customerAddress:s.customerAddress||s['ທີ່ຢູ່']||'',
-    note:s.note||s['ໝາຍເຫດ']||''
+    invNo:sinv['InvNo']||sinv.invNo,
+    date:sinv['ວັນທີ']||sinv['ວັນທີ່']||sinv.date,
+    sku:sinv['SKU']||sinv.sku,
+    productName:sinv['ສິນຄ້າ']||sinv['ຊື່ສິນຄ້າ']||sinv['ຊື່ສິນຄ້າ (ລາວ)']||sinv.productName||'',
+    qty:+sinv['qty']||+sinv['ຈຳນວນ']||1,
+    unitPrice:+sinv['ລາຄາ']||+sinv['ລາຄາ/ຊີ້ນ']||+sinv.price||+sinv.unitPrice||0,
+    discount:+sinv['ສ່ວນຫຼຸດ']||+sinv.disc||+sinv.discount||0,
+    net:+sinv['ສຸດທິ']||+sinv['ຍອດສຸດທິ']||+sinv.net||0,
+    channel:sinv['ຊ່ອງທາງ']||sinv.channel,
+    customerName:sinv['ລູກຄ້າ']||sinv['ຊື່ລູກຄ້າ']||sinv.customerName||'',
+    customerPhone:sinv['ໂທ']||sinv['ເບີໂທລະສັບ']||sinv.customerPhone||'',
+    customerAddress:sinv['ທີ່ຢູ່']||sinv.customerAddress||'',
+    note:sinv['ໝາຍເຫດ']||sinv.note||''
   });
 }
 function closeInv(){document.getElementById('invoiceModal').classList.remove('show');}
@@ -950,6 +1353,200 @@ function exportCSV(){
   a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);
   a.download=`soh-sales-${today()}.csv`;a.click();
   toast('📥 Export CSV ແລ້ວ');
+}
+
+
+// EDIT PRODUCT
+function openEditModal(sku){
+  const p=products.find(x=>(x.sku||x['SKU'])===sku);
+  if(!p)return;
+  document.getElementById('editSku').value=sku;
+  document.getElementById('editName').value=getName(p);
+  document.getElementById('editNameEn').value=p.nameEn||p['ຊື່ EN']||'';
+  document.getElementById('editPrice').value=p.price||p['ລາຄາຂາຍ']||0;
+  document.getElementById('editSalePrice').value=p.salePrice||p['ລາຄາຫຼຸດ']||0;
+  document.getElementById('editCat').value=p.cat||p['ໝວດ']||p['ໝວດໝູ່']||'ເຟີນີເຈີ';
+  document.getElementById('editImg1').value=p.imgUrl||p['URL ຮູບ']||'';
+  document.getElementById('editImg2').value=p.imgUrl2||p['URL ຮູບ 2']||'';
+  document.getElementById('editImg3').value=p.imgUrl3||p['URL ຮູບ 3']||'';
+  document.getElementById('editImg4').value=p.imgUrl4||p['URL ຮູບ 4']||'';
+  document.getElementById('editPreorder').value=String(p.preorder||'false');
+  document.getElementById('editModal').classList.add('show');
+  document.body.style.overflow='hidden';
+}
+function closeEditModal(){
+  document.getElementById('editModal').classList.remove('show');
+  document.body.style.overflow='';
+}
+async function saveEditProduct(){
+  const sku=document.getElementById('editSku').value;
+  const data={
+    sku,
+    nameTh:document.getElementById('editName').value.trim(),
+    nameEn:document.getElementById('editNameEn').value.trim(),
+    price:+document.getElementById('editPrice').value||0,
+    salePrice:+document.getElementById('editSalePrice').value||0,
+    cat:document.getElementById('editCat').value,
+    imgUrl:document.getElementById('editImg1').value.trim(),
+    imgUrl2:document.getElementById('editImg2').value.trim(),
+    imgUrl3:document.getElementById('editImg3').value.trim(),
+    imgUrl4:document.getElementById('editImg4').value.trim(),
+    preorder:document.getElementById('editPreorder').value,
+  };
+  const res=await callAPI({action:'addProduct',data});
+  if(res.status==='ok'){
+    toast(`✓ ແກ້ໄຂ "${data.nameTh}" ແລ້ວ`);
+    closeEditModal();
+    await loadData();
+  } else toast('❌ '+(res.message||'error'));
+}
+
+
+// REPORT
+let reportChart = null;
+
+function renderReport(){
+  renderLotReport();
+  renderTopProducts();
+  renderRevenueChart();
+}
+
+function renderLotReport(){
+  const el = document.getElementById('reportLots');
+  if(!el) return;
+
+  // ສະຫຼຸບຕົ້ນທຶນຈາກ lots
+  const skuMap = {};
+  for(const lot of lots){
+    const sku    = lot['SKU']    || lot.sku    || '';
+    const lotId  = lot['LotID']  || lot.lotId  || '';
+    const cost   = +lot['ຕົ້ນທຶນ'] || +lot.cost || +lot.costItem || 0;
+    const orig   = +lot['ຈຳນວນເດີມ'] || +lot.qty || 0;
+    const left   = +lot['ຄ້າງ']  || +lot.left  || 0;
+    const date   = lot['ວັນທີຊື້'] || lot.date   || '';
+    const totalCost = cost * orig;
+    const usedCost  = cost * (orig - left);
+
+    if(!sku) continue;
+    if(!skuMap[sku]) skuMap[sku] = { sku, name:'', lots:[], totalInvest:0, totalUsed:0, totalLeft:0 };
+
+    const p = products.find(x=>(x.sku||x['SKU'])===sku);
+    skuMap[sku].name = p ? (getName(p)||sku) : sku;
+    skuMap[sku].lots.push({ lotId, cost, orig, left, date, totalCost });
+    skuMap[sku].totalInvest += totalCost;
+    skuMap[sku].totalUsed   += usedCost;
+    skuMap[sku].totalLeft   += left * cost;
+  }
+
+  const grandInvest = Object.values(skuMap).reduce((s,x)=>s+x.totalInvest, 0);
+  const grandLeft   = Object.values(skuMap).reduce((s,x)=>s+x.totalLeft,   0);
+
+  let html = `<div class="rpt-summary">
+    <div><div class="rpt-s-label">ຕົ້ນທຶນລວມທັງໝົດ</div><div class="rpt-s-val">₭${fmt(grandInvest)}</div></div>
+    <div><div class="rpt-s-label">ຕົ້ນທຶນທີ່ຍັງຄ້າງ (stock)</div><div class="rpt-s-val g">₭${fmt(grandLeft)}</div></div>
+  </div>`;
+
+  html += Object.values(skuMap).map(s => {
+    const lotRows = s.lots.map((l,i) =>
+      `<div style="font-size:11px;color:var(--brown);padding:4px 0;border-bottom:1px solid var(--sand)">
+        <span style="color:var(--gold2)">Lot ${i+1}</span> · ${l.date} · ${l.orig} ຊີ້ນ @ ₭${fmt(l.cost)} · ຄ້າງ ${l.left} · ຕົ້ນທຶນລວມ ₭${fmt(l.totalCost)}
+      </div>`
+    ).join('');
+    return `<div class="rpt-card" style="flex-direction:column;align-items:flex-start">
+      <div style="display:flex;justify-content:space-between;width:100%;margin-bottom:8px">
+        <div>
+          <div class="rpt-name">${s.name}</div>
+          <div class="rpt-sub">${s.sku} · ${s.lots.length} Lot</div>
+        </div>
+        <div class="rpt-val">₭${fmt(s.totalInvest)}<br><small>ຕົ້ນທຶນລວມ</small></div>
+      </div>
+      ${lotRows}
+    </div>`;
+  }).join('');
+
+  el.innerHTML = html;
+}
+
+function renderTopProducts(){
+  const el = document.getElementById('reportTopProducts');
+  if(!el) return;
+
+  // ນັບຈາກ sales
+  const skuSales = {};
+  for(const s of sales){
+    const sku  = s['SKU']  || s.sku  || '';
+    const name = s['ສິນຄ້າ'] || s.productName || sku;
+    const qty  = +s['ຈຳນວນ'] || +s.qty  || 0;
+    const net  = +s['ຍອດສຸດທິ'] || +s.net || 0;
+    const profit = +s['ກຳໄລ'] || +s.profit || 0;
+    if(!sku) continue;
+    if(!skuSales[sku]) skuSales[sku] = { sku, name, qty:0, net:0, profit:0 };
+    skuSales[sku].qty    += qty;
+    skuSales[sku].net    += net;
+    skuSales[sku].profit += profit;
+  }
+
+  const sorted = Object.values(skuSales).sort((a,b)=>b.qty-a.qty);
+  if(!sorted.length){ el.innerHTML='<div style="padding:20px;text-align:center;color:var(--brown)">ຍັງບໍ່ມີຂໍ້ມູນການຂາຍ</div>'; return; }
+
+  const maxQty = sorted[0].qty || 1;
+  el.innerHTML = sorted.map((s,i) => `
+    <div class="rpt-card">
+      <div style="flex:1">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+          ${i<3?`<span class="rpt-badge">#${i+1}</span>`:`<span style="font-size:12px;color:var(--brown)">#${i+1}</span>`}
+          <div class="rpt-name">${s.name}</div>
+        </div>
+        <div style="background:var(--sand);border-radius:4px;height:6px;margin-bottom:4px">
+          <div style="background:var(--gold2);height:6px;border-radius:4px;width:${Math.round(s.qty/maxQty*100)}%"></div>
+        </div>
+        <div class="rpt-sub">${s.qty} ຊີ້ນ · ລາຍຮັບ ₭${fmt(s.net)} · ກຳໄລ ₭${fmt(s.profit)}</div>
+      </div>
+    </div>`
+  ).join('');
+}
+
+function renderRevenueChart(){
+  const canvas = document.getElementById('reportChart');
+  if(!canvas) return;
+
+  // ໂຮມຍອດຂາຍຕາມເດືອນ
+  const monthly = {};
+  for(const s of sales){
+    const date = s['ວັນທີ'] || s.date || '';
+    const mon  = date.slice(0,7); // yyyy-MM
+    if(!mon) continue;
+    if(!monthly[mon]) monthly[mon] = { net:0, cost:0, profit:0 };
+    monthly[mon].net    += +s['ຍອດສຸດທິ'] || +s.net    || 0;
+    monthly[mon].cost   += +s['ຕົ້ນທຶນລວມ'] || +s.costTotal || 0;
+    monthly[mon].profit += +s['ກຳໄລ']      || +s.profit  || 0;
+  }
+
+  const labels  = Object.keys(monthly).sort();
+  const revenue = labels.map(m => monthly[m].net);
+  const costs   = labels.map(m => monthly[m].cost);
+  const profits = labels.map(m => monthly[m].profit);
+
+  if(reportChart) reportChart.destroy();
+
+  reportChart = new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        { label:'ລາຍຮັບ',   data:revenue, backgroundColor:'rgba(212,168,90,0.8)',  borderRadius:4 },
+        { label:'ຕົ້ນທຶນ',   data:costs,   backgroundColor:'rgba(139,107,74,0.6)',  borderRadius:4 },
+        { label:'ກຳໄລ',     data:profits, backgroundColor:'rgba(74,140,92,0.8)',   borderRadius:4, type:'line', tension:0.3, fill:false, borderColor:'#4A8C5C', pointBackgroundColor:'#4A8C5C' },
+      ]
+    },
+    options:{
+      responsive:true,
+      plugins:{ legend:{ position:'top' } },
+      scales:{
+        y:{ ticks:{ callback: v => '₭'+Number(v).toLocaleString('th') } }
+      }
+    }
+  });
 }
 
 // TOAST
