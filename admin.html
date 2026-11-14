@@ -700,15 +700,18 @@ async function loadData(){
   showLoadWarning();
 }
 
-// ສະຕ໋ອກສຳຮອງ: ຄິດຈາກຈຳນວນ "ຄ້າງ" ໃນ Lot — ໃຊ້ເມື່ອ getStock ໄດ້ 0 ຫຼື ບໍ່ມີ
+// ສະຕ໋ອກ: ໃຊ້ຕົວເລກຈາກ server ຖ້າ > 0; ຖ້າເປັນ 0/ບໍ່ມີ → ໃຊ້ຈຳນວນ "ຄ້າງ" ໃນ Lot ແທນ
+let serverStock={};
 function syncStockFromLots(){
+  serverStock={};
+  Object.entries(stockMap).forEach(([k,v])=>serverStock[k]=Number((v||{}).qty||0));
   const left={};
   lots.forEach(l=>{const k=l['SKU']||l.sku;if(!k)return;
     const q=(l['ຄ້າງ']!==undefined&&l['ຄ້າງ']!=='')?+l['ຄ້າງ']:(+l.left||0);
     left[k]=(left[k]||0)+(q||0);});
   Object.entries(left).forEach(([k,q])=>{
     const cur=stockMap[k]||{qty:0,minQty:3};
-    if(q>Number(cur.qty||0))stockMap[k]={...cur,qty:q};
+    if(!(Number(cur.qty)>0)&&q>0)stockMap[k]={...cur,qty:q};
   });
   products.forEach(p=>{const k=p.sku||p['SKU'];if(k&&!stockMap[k])stockMap[k]={qty:0,minQty:3};});
 }
@@ -883,7 +886,12 @@ async function delProduct(sku){
   toast('ລົບແລ້ວ');await loadData();
 }
 async function chStock(sku,delta){
-  await callAPI({action:'updateStock',data:{sku,delta}});
+  // ຕົວເລກທີ່ຕ້ອງການ = ທີ່ເຫັນ + delta; ສົ່ງສ່ວນຕ່າງໃຫ້ server ເພື່ອໃຫ້ server ກົງກັບທີ່ເຫັນ
+  const shown=Number((stockMap[sku]||{}).qty||0);
+  const target=Math.max(0,shown+delta);
+  const send=target-Number(serverStock[sku]||0);
+  stockMap[sku]={...(stockMap[sku]||{minQty:3}),qty:target};renderProdList();
+  if(send!==0)await callAPI({action:'updateStock',data:{sku,delta:send}});
   const p=products.find(x=>(x.sku||x['SKU'])===sku);
   toast(`${delta>0?'+':''}${delta} ສະຕ໋ອກ "${p?getName(p)||sku:sku}"`);
   await loadData();
