@@ -778,7 +778,7 @@ function renderProdList(){
         ${stB}
         <div class="stock-ctrl">
           <button class="s-btn" onclick="chStock('${sku}',-1)">−</button>
-          <div class="s-num">${qty}</div>
+          <input class="s-num" type="number" min="0" value="${qty}" title="ພິມຈຳນວນແລ້ວກົດ Enter" style="width:56px;text-align:center;border:1px solid var(--sand);background:transparent;font:inherit" onfocus="this.select()" onkeydown="if(event.key==='Enter')this.blur()" onchange="setStock('${sku}',this.value)">
           <button class="s-btn" onclick="chStock('${sku}',1)">+</button>
         </div>
         <button class="btn-sm-del" onclick="openEditModal('${sku}')" style="color:var(--gold2)">✏️</button>
@@ -885,16 +885,23 @@ async function delProduct(sku){
   await callAPI({action:'deleteProduct',data:{sku}});
   toast('ລົບແລ້ວ');await loadData();
 }
-async function chStock(sku,delta){
-  // ຕົວເລກທີ່ຕ້ອງການ = ທີ່ເຫັນ + delta; ສົ່ງສ່ວນຕ່າງໃຫ້ server ເພື່ອໃຫ້ server ກົງກັບທີ່ເຫັນ
+// ປ່ຽນສະຕ໋ອກ: ອັບເດດໜ້າທັນທີ, ສົ່ງ server ຕາມລຳດັບ, ໂຫຼດໃໝ່ຫຼັງຢຸດກົດ 2 ວິ
+let stockQueue=Promise.resolve(),stockReloadT=null;
+function chStock(sku,delta){
   const shown=Number((stockMap[sku]||{}).qty||0);
-  const target=Math.max(0,shown+delta);
+  setStock(sku,Math.max(0,shown+delta));
+}
+function setStock(sku,target){
+  target=Math.max(0,Math.round(Number(target)||0));
   const send=target-Number(serverStock[sku]||0);
-  stockMap[sku]={...(stockMap[sku]||{minQty:3}),qty:target};renderProdList();
-  if(send!==0)await callAPI({action:'updateStock',data:{sku,delta:send}});
+  serverStock[sku]=target;                       // ຈື່ໄວ້ທັນທີ ກັນກົດໄວແລ້ວນັບຊ້ຳ
+  stockMap[sku]={...(stockMap[sku]||{minQty:3}),qty:target};
+  renderProdList();renderStats();
   const p=products.find(x=>(x.sku||x['SKU'])===sku);
-  toast(`${delta>0?'+':''}${delta} ສະຕ໋ອກ "${p?getName(p)||sku:sku}"`);
-  await loadData();
+  toast(`ສະຕ໋ອກ "${p?getName(p)||sku:sku}" = ${target}`);
+  if(send!==0)stockQueue=stockQueue.then(()=>callAPI({action:'updateStock',data:{sku,delta:send}}));
+  clearTimeout(stockReloadT);
+  stockReloadT=setTimeout(()=>stockQueue.then(()=>loadData()),2000);
 }
 
 // LOT
